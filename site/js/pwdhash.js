@@ -22,7 +22,7 @@
  * Initialize page with default hashing parameters.
  */
 function Init() {
-	document.hashform.domain.value = "http://www.example.com/";
+	document.hashform.domain.value = "";
 	document.hashform.sitePassword.value = "";
 	document.hashform.hashedPassword.value = "Press Generate";
 	document.hashform.hashedPassword.disabled = true;
