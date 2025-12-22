@@ -1,7 +1,7 @@
 /* 
    pwdhash-enhanced.js
-   Features: Min/Max Length, Special Character Rules, Capitalization, URL State, User Hint
-   Fixes: CSP compliance, Logic order for Max Length
+   Features: Min/Max Length, Special Character Rules, Capitalization, URL State, User Hint, Dynamic Title
+   Fixes: CSP compliance, Logic order for Max Length, Selector specificity
 */
 
 window.addEventListener('load', function() {
@@ -96,8 +96,7 @@ function injectInterface() {
         input.type = "text";
         input.id = id;
         input.placeholder = "Optional";
-        input.style.width = "140px"; // Slightly wider for text
-        // Note: Hints do not trigger applyConstraints as they don't change the hash
+        input.style.width = "140px";
 
         tdInput.appendChild(input);
         tr.appendChild(tdLabel);
@@ -137,11 +136,10 @@ function injectInterface() {
 
 // --- 2. Listeners ---
 function attachListeners() {
+    // General listeners for hash generation
     var inputs = document.querySelectorAll('input[type="text"], input[type="password"]');
     inputs.forEach(function(el) {
-        // Skip the hint field for hash generation triggers
-        if (el.id === 'ext-hint') return;
-
+        if (el.id === 'ext-hint') return; // Skip hint field for hash gen
         el.addEventListener('keyup', function() { setTimeout(processHash, 50); });
         el.addEventListener('change', function() { setTimeout(processHash, 50); });
     });
@@ -150,6 +148,20 @@ function attachListeners() {
     genBtns.forEach(function(btn) {
         btn.addEventListener('click', function() { setTimeout(processHash, 50); });
     });
+
+    // Specific listener for Page Title updates (Site Keyword field)
+    // We use :not(#ext-hint) to ensure we don't grab the hint field by mistake
+    var siteInput = document.querySelector('input[type="text"]:not([readonly]):not(#ext-hint)');
+    if (siteInput) {
+        var updateTitle = function() {
+            if (siteInput.value) {
+                document.title = "Site password for " + siteInput.value;
+            }
+        };
+        siteInput.addEventListener('input', updateTitle);
+        siteInput.addEventListener('keyup', updateTitle);
+        siteInput.addEventListener('change', updateTitle);
+    }
 }
 
 // --- 3. Core Logic ---
@@ -198,7 +210,7 @@ function applyConstraints() {
         }
     }
 
-    // 3. Truncate: Max Length (Strictly before enforcement)
+    // 3. Truncate: Max Length
     if (!isNaN(max) && max > 0 && result.length > max) {
         result = result.substring(0, max);
     }
@@ -218,7 +230,7 @@ function applyConstraints() {
         }
     }
 
-    // 5. Enforce Number & Symbol (Append or Overwrite end)
+    // 5. Enforce Number & Symbol
     var suffix = "";
 
     if (reqNum && !/\d/.test(result)) {
@@ -258,15 +270,18 @@ function loadFromUrl() {
     if (params.get('min')) document.getElementById('ext-minLength').value = params.get('min');
     if (params.get('max')) document.getElementById('ext-maxLength').value = params.get('max');
 
-    // Set Hint (New)
+    // Set Hint
     if (params.get('hint')) document.getElementById('ext-hint').value = params.get('hint');
 
     // Set Site & Trigger
     var site = params.get('site') || params.get('keyword');
     if (site) {
-        var siteInput = document.querySelector('input[type="text"]:not([readonly])');
+        // Ensure we find the main keyword input, not our hint field
+        var siteInput = document.querySelector('input[type="text"]:not([readonly]):not(#ext-hint)');
         if (siteInput) {
             siteInput.value = site;
+            document.title = "Site password for " + site; // Update Title on Load
+            
             if (typeof Generate === 'function') Generate();
             else if (typeof generate === 'function') generate();
             setTimeout(processHash, 100);
@@ -275,7 +290,7 @@ function loadFromUrl() {
 }
 
 function copySafeUrl() {
-    var siteInput = document.querySelector('input[type="text"]:not([readonly])');
+    var siteInput = document.querySelector('input[type="text"]:not([readonly]):not(#ext-hint)');
     var url = new URL(window.location.href);
 
     var setBool = (id, param) => {
@@ -296,7 +311,7 @@ function copySafeUrl() {
     setBool('chk-reqcap', 'reqcap');
     setVal('ext-minLength', 'min');
     setVal('ext-maxLength', 'max');
-    setVal('ext-hint', 'hint'); // Save Hint
+    setVal('ext-hint', 'hint');
 
     window.history.replaceState({}, '', url);
     navigator.clipboard.writeText(url.toString()).then(function() {
