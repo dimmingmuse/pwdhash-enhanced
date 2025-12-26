@@ -137,19 +137,19 @@ function injectInterface() {
 
     // Insert Copy Button
     var btnRow = document.createElement('tr');
-    var emptyTd = document.createElement('td');
     var btnTd = document.createElement('td');
+    btnTd.colSpan = 2;
     var btn = document.createElement('button');
     btn.type = "button";
-    btn.innerText = "Copy Link for this Config";
+    btn.innerText = "Copy config link";
     btn.style.marginTop = "8px";
     btn.style.cursor = "pointer";
+    btn.style.whiteSpace = "nowrap";
     btn.onclick = copySafeUrl;
 
     btnTd.appendChild(btn);
-    btnRow.appendChild(emptyTd);
     btnRow.appendChild(btnTd);
-    parentTable.insertBefore(btnRow, refRow);
+    parentTable.insertBefore(btnRow, refRow.nextSibling);
 
     ensureCopyNotice();
 }
