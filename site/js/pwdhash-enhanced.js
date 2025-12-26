@@ -355,7 +355,7 @@ function ensureCopyNotice() {
     var notice = document.createElement('div');
     notice.id = "copy-notice";
     notice.className = "copy-notice";
-    notice.innerText = "✓ Password copied to clipboard!";
+    notice.innerText = "Password copied to clipboard.";
     notice.setAttribute('role', 'status');
     notice.setAttribute('aria-live', 'polite');
 
