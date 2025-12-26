@@ -28,10 +28,12 @@ function injectInterface() {
     // Helper to create checkbox row (CSP Safe)
     function createCheckRow(id, label, iconHtml) {
         var tr = document.createElement('tr');
+        tr.className = "check-row";
         
         var tdLabel = document.createElement('td');
         tdLabel.className = "label";
         tdLabel.style.verticalAlign = "middle";
+        tdLabel.classList.add("check-label");
         
         var span = document.createElement('span');
         span.style.display = "inline-flex";
@@ -42,6 +44,7 @@ function injectInterface() {
         tdLabel.appendChild(span);
         
         var tdInput = document.createElement('td');
+        tdInput.classList.add("check-input");
         var input = document.createElement('input');
         input.type = "checkbox";
         input.id = id;
@@ -55,52 +58,60 @@ function injectInterface() {
         return tr;
     }
 
-    // Helper to create number input row
-    function createNumRow(id, label) {
-        var tr = document.createElement('tr');
-        var tdLabel = document.createElement('td');
-        tdLabel.className = "label";
-        
-        var b = document.createElement('strong');
-        b.innerText = label;
-        tdLabel.appendChild(b);
-        
-        var tdInput = document.createElement('td');
+    function createInlineField(id, label, type, placeholder) {
+        var wrapper = document.createElement('div');
+        wrapper.className = "inline-field";
+
+        var labelEl = document.createElement('label');
+        labelEl.setAttribute('for', id);
+        labelEl.innerText = label;
+
         var input = document.createElement('input');
-        input.type = "number";
+        input.type = type;
         input.id = id;
-        input.placeholder = "Default";
-        input.style.width = "80px";
-        
+        input.placeholder = placeholder;
+
+        if (type === "number") {
+            input.style.width = "100%";
+        } else {
+            input.style.width = "100%";
+        }
+
         input.addEventListener('input', applyConstraints);
         input.addEventListener('change', applyConstraints);
 
-        tdInput.appendChild(input);
-        tr.appendChild(tdLabel);
-        tr.appendChild(tdInput);
+        wrapper.appendChild(labelEl);
+        wrapper.appendChild(input);
+        return wrapper;
+    }
+
+    function createInlineFieldsRow(fields) {
+        var tr = document.createElement('tr');
+        tr.className = "inline-fields-row";
+
+        var td = document.createElement('td');
+        td.colSpan = 2;
+
+        var container = document.createElement('div');
+        container.className = "inline-fields";
+        fields.forEach(function(field) {
+            container.appendChild(createInlineField(field.id, field.label, field.type, field.placeholder));
+        });
+
+        td.appendChild(container);
+        tr.appendChild(td);
         return tr;
     }
 
-    // Helper to create text input row (For Hints)
-    function createTextRow(id, label) {
+    function createSingleFieldRow(field, rowClass) {
         var tr = document.createElement('tr');
-        var tdLabel = document.createElement('td');
-        tdLabel.className = "label";
-        
-        var b = document.createElement('strong');
-        b.innerText = label;
-        tdLabel.appendChild(b);
-        
-        var tdInput = document.createElement('td');
-        var input = document.createElement('input');
-        input.type = "text";
-        input.id = id;
-        input.placeholder = "Optional";
-        input.style.width = "140px";
+        tr.className = rowClass || "";
 
-        tdInput.appendChild(input);
-        tr.appendChild(tdLabel);
-        tr.appendChild(tdInput);
+        var td = document.createElement('td');
+        td.colSpan = 2;
+        td.appendChild(createInlineField(field.id, field.label, field.type, field.placeholder));
+
+        tr.appendChild(td);
         return tr;
     }
 
@@ -110,12 +121,14 @@ function injectInterface() {
     parentTable.insertBefore(createCheckRow("chk-reqsym", "Require Symbol", "<b>@</b>"), refRow);
     parentTable.insertBefore(createCheckRow("chk-reqcap", "Require Uppercase", iconCap), refRow);
 
-    // Insert Min/Max
-    parentTable.insertBefore(createNumRow("ext-minLength", "Min Length:"), refRow);
-    parentTable.insertBefore(createNumRow("ext-maxLength", "Max Length:"), refRow);
-
-    // Insert Hint Field
-    parentTable.insertBefore(createTextRow("ext-hint", "Hint:"), refRow);
+    parentTable.insertBefore(createInlineFieldsRow([
+        { id: "ext-minLength", label: "Min Length", type: "number", placeholder: "Default" },
+        { id: "ext-maxLength", label: "Max Length", type: "number", placeholder: "Default" }
+    ]), refRow);
+    parentTable.insertBefore(createSingleFieldRow(
+        { id: "ext-hint", label: "Hint", type: "text", placeholder: "Optional" },
+        "hint-row"
+    ), refRow);
 
     // Insert Copy Button
     var btnRow = document.createElement('tr');
@@ -132,6 +145,8 @@ function injectInterface() {
     btnRow.appendChild(emptyTd);
     btnRow.appendChild(btnTd);
     parentTable.insertBefore(btnRow, refRow);
+
+    ensureCopyNotice();
 }
 
 // --- 2. Listeners ---
@@ -184,6 +199,7 @@ function applyConstraints() {
     var hashField = document.getElementById('hashedPassword') || document.getElementsByName('hashedPassword')[0];
     if (!hashField) return;
 
+    var previousOutput = hashField.getAttribute('data-last-output');
     var fullHash = hashField.getAttribute('data-full-hash');
     if (!fullHash) return;
 
@@ -254,6 +270,43 @@ function applyConstraints() {
 
     hashField.value = result;
     hashField.setAttribute('data-last-output', result);
+    if (result && result !== previousOutput) {
+        copyGeneratedPassword(result);
+    }
+}
+
+function copyGeneratedPassword(password) {
+    if (!navigator.clipboard || !navigator.clipboard.writeText) return;
+    navigator.clipboard.writeText(password).then(function() {
+        showCopyNotice();
+    }).catch(function() {});
+}
+
+function ensureCopyNotice() {
+    var existing = document.getElementById('copy-notice');
+    if (existing) return existing;
+
+    var hashedSection = document.getElementById('theHashedPassword');
+    if (!hashedSection) return null;
+
+    var notice = document.createElement('div');
+    notice.id = "copy-notice";
+    notice.className = "copy-notice";
+    notice.innerText = "Password copied";
+
+    hashedSection.appendChild(notice);
+    return notice;
+}
+
+var copyNoticeTimer;
+function showCopyNotice() {
+    var notice = ensureCopyNotice();
+    if (!notice) return;
+    notice.classList.add('show');
+    if (copyNoticeTimer) clearTimeout(copyNoticeTimer);
+    copyNoticeTimer = setTimeout(function() {
+        notice.classList.remove('show');
+    }, 1600);
 }
 
 // --- 4. URL State ---

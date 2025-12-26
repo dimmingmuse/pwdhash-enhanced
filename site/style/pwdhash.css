@@ -18,7 +18,7 @@
 body 
 { 
   font-family: sans-serif; 
-  margin: 25px 25px 25px 25px; 
+  margin: 0 12px 16px 12px; 
   text-align: center; 
   font-size: smaller;
 }
@@ -134,7 +134,7 @@ div.footer
 
 .leftmargin
 {
-  margin: 3em auto 1em auto;
+  margin: 0 auto 1em auto;
 }
 
 .textcentre {
@@ -151,6 +151,52 @@ table#theHashForm button
   box-sizing: border-box;
 }
 
+.inline-fields
+{
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+  width: 100%;
+}
+
+.inline-field
+{
+  flex: 1 1 0;
+  min-width: 0;
+  text-align: left;
+}
+
+.inline-field label
+{
+  display: block;
+  font-size: 70%;
+}
+
+.inline-field input
+{
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.hint-row .inline-field
+{
+  width: 100%;
+}
+
+.copy-notice
+{
+  font-size: 70%;
+  color: green;
+  opacity: 0;
+  margin-top: 6px;
+  transition: opacity 0.2s ease;
+}
+
+.copy-notice.show
+{
+  opacity: 1;
+}
+
 @media (max-width: 700px)
 {
   body
@@ -165,6 +211,28 @@ table#theHashForm button
     width: 100%;
   }
 
+  table#theHashForm tr.check-row
+  {
+    display: table-row;
+  }
+
+  table#theHashForm tr.check-row td
+  {
+    display: table-cell;
+    width: auto;
+  }
+
+  table#theHashForm tr.inline-fields-row
+  {
+    display: table-row;
+  }
+
+  table#theHashForm tr.inline-fields-row td
+  {
+    display: table-cell;
+    width: auto;
+  }
+
   td.stepList
   {
     padding: 0px 0px 12px 0px;
@@ -176,3 +244,15 @@ table#theHashForm button
   }
 }
 
+@media (max-width: 360px)
+{
+  .inline-fields
+  {
+    gap: 6px;
+  }
+
+  .inline-field label
+  {
+    font-size: 65%;
+  }
+}
