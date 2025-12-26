@@ -281,23 +281,31 @@ function applyConstraints() {
 
     var result = fullHash;
 
-    // 1. Pad: Min Length
-    if (!isNaN(min) && min > 0) {
-        while (result.length < min) {
-            result += result;
+    function applyLengthConstraints() {
+        // Pad: Min Length
+        if (!isNaN(min) && min > 0) {
+            while (result.length < min) {
+                result += result;
+            }
+        }
+
+        // Truncate: Max Length
+        if (!isNaN(max) && max > 0 && result.length > max) {
+            result = result.substring(0, max);
         }
     }
 
-    // 2. Truncate: Max Length
-    if (!isNaN(max) && max > 0 && result.length > max) {
-        result = result.substring(0, max);
-    }
+    // 1. Pad/Truncate to Length Constraints
+    applyLengthConstraints();
 
     // 3. Filter: Ban Symbols
     if (noSym) {
         result = result.replace(/[^a-zA-Z0-9]/g, '');
         if (result.length === 0) result = "Res" + fullHash.length;
     }
+
+    // Re-apply length constraints after filtering to honor min/max limits.
+    applyLengthConstraints();
 
     function insertOrReplace(char, avoidRegexes) {
         if (!isNaN(max) && max > 0 && result.length >= max) {
@@ -318,34 +326,42 @@ function applyConstraints() {
         }
     }
 
-    // 4. Enforce Uppercase
-    if (reqCap && !/[A-Z]/.test(result)) {
-        if (/[a-z]/.test(result)) {
-            result = result.replace(/[a-z]/, function(c) { return c.toUpperCase(); });
-        } else {
-            var caps = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-            var upperChar = caps.charAt(result.charCodeAt(0) % caps.length);
-            insertOrReplace(upperChar);
+    var requiredTypes = 0;
+    if (reqCap) requiredTypes += 1;
+    if (reqNum) requiredTypes += 1;
+    if (reqSym && !noSym) requiredTypes += 1;
+    var canEnforceAll = isNaN(max) || max === 0 || max >= requiredTypes;
+
+    if (canEnforceAll) {
+        // 4. Enforce Uppercase
+        if (reqCap && !/[A-Z]/.test(result)) {
+            if (/[a-z]/.test(result)) {
+                result = result.replace(/[a-z]/, function(c) { return c.toUpperCase(); });
+            } else {
+                var caps = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                var upperChar = caps.charAt(result.charCodeAt(0) % caps.length);
+                insertOrReplace(upperChar);
+            }
         }
-    }
 
-    // 5. Enforce Number
-    if (reqNum && !/\d/.test(result)) {
-        var numberChar = (result.length % 10).toString();
-        var avoidForNumber = [];
-        if (reqCap) avoidForNumber.push(/[A-Z]/);
-        if (reqSym && !noSym) avoidForNumber.push(/[^a-zA-Z0-9]/);
-        insertOrReplace(numberChar, avoidForNumber);
-    }
+        // 5. Enforce Number
+        if (reqNum && !/\d/.test(result)) {
+            var numberChar = (result.length % 10).toString();
+            var avoidForNumber = [];
+            if (reqCap) avoidForNumber.push(/[A-Z]/);
+            if (reqSym && !noSym) avoidForNumber.push(/[^a-zA-Z0-9]/);
+            insertOrReplace(numberChar, avoidForNumber);
+        }
 
-    // 6. Enforce Symbol
-    if (reqSym && !noSym && !/[^a-zA-Z0-9]/.test(result)) {
-        var syms = "!@#$%^&*";
-        var symbolChar = syms.charAt(result.charCodeAt(0) % syms.length);
-        var avoidForSymbol = [];
-        if (reqCap) avoidForSymbol.push(/[A-Z]/);
-        if (reqNum) avoidForSymbol.push(/\d/);
-        insertOrReplace(symbolChar, avoidForSymbol);
+        // 6. Enforce Symbol
+        if (reqSym && !noSym && !/[^a-zA-Z0-9]/.test(result)) {
+            var syms = "!@#$%^&*";
+            var symbolChar = syms.charAt(result.charCodeAt(0) % syms.length);
+            var avoidForSymbol = [];
+            if (reqCap) avoidForSymbol.push(/[A-Z]/);
+            if (reqNum) avoidForSymbol.push(/\d/);
+            insertOrReplace(symbolChar, avoidForSymbol);
+        }
     }
 
     hashField.value = result;
