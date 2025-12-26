@@ -122,9 +122,9 @@ function injectInterface() {
     }
 
     // Insert Checkboxes
+    parentTable.insertBefore(createCheckRow("chk-reqsym", "Require Symbol", "<b>@</b>"), insertBeforeRow);
     parentTable.insertBefore(createCheckRow("chk-nosym", "Ban Symbols", iconNoSym), insertBeforeRow);
     parentTable.insertBefore(createCheckRow("chk-reqnum", "Require Number", "<b>#</b>"), insertBeforeRow);
-    parentTable.insertBefore(createCheckRow("chk-reqsym", "Require Symbol", "<b>@</b>"), insertBeforeRow);
     parentTable.insertBefore(createCheckRow("chk-reqcap", "Require Uppercase", iconCap), insertBeforeRow);
 
     parentTable.insertBefore(createInlineFieldsRow([
@@ -168,6 +168,7 @@ function attachListeners() {
 
     var hashField = document.getElementById('hashedPassword') || document.getElementsByName('hashedPassword')[0];
     if (hashField) {
+        configureHashedPasswordField(hashField);
         hashField.addEventListener('click', function() {
             if (hashField.value && hashField.value !== "Press Generate") {
                 copyGeneratedPassword(hashField.value);
@@ -187,6 +188,39 @@ function attachListeners() {
         siteInput.addEventListener('input', updateTitle);
         siteInput.addEventListener('keyup', updateTitle);
         siteInput.addEventListener('change', updateTitle);
+    }
+
+    var noSymInput = document.getElementById('chk-nosym');
+    var reqSymInput = document.getElementById('chk-reqsym');
+    if (noSymInput && reqSymInput) {
+        noSymInput.addEventListener('change', function() {
+            if (noSymInput.checked) {
+                reqSymInput.checked = false;
+            }
+            applyConstraints();
+        });
+        reqSymInput.addEventListener('change', function() {
+            if (reqSymInput.checked) {
+                noSymInput.checked = false;
+            }
+            applyConstraints();
+        });
+    }
+
+    var minInput = document.getElementById('ext-minLength');
+    var maxInput = document.getElementById('ext-maxLength');
+    var iterationInput = document.getElementsByName('iterations')[0];
+    if (minInput) {
+        minInput.addEventListener('input', function() { validateNumberInput(minInput, { minValue: 0 }); });
+        minInput.addEventListener('change', function() { validateNumberInput(minInput, { minValue: 0 }); });
+    }
+    if (maxInput) {
+        maxInput.addEventListener('input', function() { validateNumberInput(maxInput, { minValue: 0 }); });
+        maxInput.addEventListener('change', function() { validateNumberInput(maxInput, { minValue: 0 }); });
+    }
+    if (iterationInput) {
+        iterationInput.addEventListener('input', function() { validateNumberInput(iterationInput, { minValue: 1 }); });
+        iterationInput.addEventListener('change', function() { validateNumberInput(iterationInput, { minValue: 1 }); });
     }
 }
 
@@ -238,8 +272,10 @@ function applyConstraints() {
     var reqNum = document.getElementById('chk-reqnum').checked;
     var reqSym = document.getElementById('chk-reqsym').checked;
     var reqCap = document.getElementById('chk-reqcap').checked;
-    var min = parseInt(document.getElementById('ext-minLength').value);
-    var max = parseInt(document.getElementById('ext-maxLength').value);
+    var minInput = document.getElementById('ext-minLength');
+    var maxInput = document.getElementById('ext-maxLength');
+    var min = getValidatedNumber(minInput, { minValue: 0 });
+    var max = getValidatedNumber(maxInput, { minValue: 0 });
 
     var result = fullHash;
 
@@ -319,7 +355,9 @@ function ensureCopyNotice() {
     var notice = document.createElement('div');
     notice.id = "copy-notice";
     notice.className = "copy-notice";
-    notice.innerText = "Password copied";
+    notice.innerText = "✓ Password copied to clipboard!";
+    notice.setAttribute('role', 'status');
+    notice.setAttribute('aria-live', 'polite');
 
     hashedSection.appendChild(notice);
     return notice;
@@ -333,7 +371,35 @@ function showCopyNotice() {
     if (copyNoticeTimer) clearTimeout(copyNoticeTimer);
     copyNoticeTimer = setTimeout(function() {
         notice.classList.remove('show');
-    }, 1600);
+    }, 2400);
+}
+
+function configureHashedPasswordField(hashField) {
+    var hintText = "Click to copy the password";
+    hashField.placeholder = hintText;
+    hashField.title = hintText;
+    hashField.setAttribute('aria-label', hintText);
+    hashField.setAttribute('aria-describedby', 'copy-notice');
+}
+
+function getValidatedNumber(input, options) {
+    if (!input) return NaN;
+    var raw = input.value.trim();
+    if (!raw) return NaN;
+    var num = Number(raw);
+    if (!Number.isFinite(num) || num < options.minValue) {
+        input.value = "";
+        return NaN;
+    }
+    if (!Number.isInteger(num)) {
+        num = Math.floor(num);
+        input.value = num.toString();
+    }
+    return num;
+}
+
+function validateNumberInput(input, options) {
+    getValidatedNumber(input, options);
 }
 
 // --- 4. URL State ---
