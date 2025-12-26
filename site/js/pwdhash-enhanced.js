@@ -21,6 +21,7 @@ function injectInterface() {
     var parentTable = passRow.parentNode;
     var refRow = passRow.nextElementSibling;
     var insertBeforeRow = refRow ? refRow.nextElementSibling : null;
+    var hashField = document.getElementsByName('hashedPassword')[0];
 
     // SVG Icons
     var iconNoSym = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg>`;
@@ -152,6 +153,7 @@ function injectInterface() {
     btnRow.appendChild(btnTd);
     parentTable.insertBefore(btnRow, insertBeforeRow);
 
+    insertHashedPasswordCopyButton(hashField);
     ensureCopyNotice();
 }
 
@@ -375,7 +377,7 @@ function showCopyNotice() {
 }
 
 function configureHashedPasswordField(hashField) {
-    var hintText = "Click to copy the password";
+    var hintText = "Click the copy button to copy the password";
     hashField.placeholder = hintText;
     hashField.title = hintText;
     hashField.setAttribute('aria-label', hintText);
@@ -400,6 +402,32 @@ function getValidatedNumber(input, options) {
 
 function validateNumberInput(input, options) {
     getValidatedNumber(input, options);
+}
+
+function insertHashedPasswordCopyButton(hashField) {
+    if (!hashField) return;
+    var existing = document.getElementById('hashedPasswordCopyButton');
+    if (existing) return;
+
+    var wrapper = document.createElement('div');
+    wrapper.className = 'hashed-password-actions';
+
+    var button = document.createElement('button');
+    button.type = 'button';
+    button.id = 'hashedPasswordCopyButton';
+    button.className = 'copy-button';
+    button.setAttribute('aria-label', 'Copy hashed password');
+    button.title = 'Copy hashed password';
+    button.innerText = '📋';
+    button.addEventListener('click', function() {
+        if (hashField.value && hashField.value !== "Press Generate") {
+            copyGeneratedPassword(hashField.value);
+        }
+    });
+
+    var parent = hashField.parentNode;
+    parent.insertBefore(wrapper, hashField.nextSibling);
+    wrapper.appendChild(button);
 }
 
 // --- 4. URL State ---

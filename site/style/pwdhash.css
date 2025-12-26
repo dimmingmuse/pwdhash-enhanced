@@ -230,6 +230,30 @@ table#theHashForm tr.check-row td.check-input
   transform: translateY(0);
 }
 
+.hashed-password-actions
+{
+  display: inline-flex;
+  align-items: center;
+  margin-left: 6px;
+}
+
+.copy-button
+{
+  border: 1px solid #bdbdbd;
+  background: #f6f6f6;
+  border-radius: 6px;
+  padding: 4px 6px;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.copy-button:hover,
+.copy-button:focus
+{
+  background: #eeeeee;
+}
+
 @media (max-width: 700px)
 {
   body
