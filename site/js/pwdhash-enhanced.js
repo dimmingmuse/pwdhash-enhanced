@@ -75,6 +75,8 @@ function injectInterface() {
             input.style.width = "100%";
             if (id === "ext-minLength" || id === "ext-maxLength") {
                 input.classList.add("length-input");
+                input.maxLength = 3;
+                input.setAttribute("maxlength", "3");
             }
         } else {
             input.style.width = "100%";

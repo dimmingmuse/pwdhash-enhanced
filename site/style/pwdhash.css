@@ -180,9 +180,9 @@ table#theHashForm button
 
 .inline-field input.length-input
 {
-  width: 3ch;
+  width: 40%;
   min-width: 3ch;
-  max-width: 3ch;
+  max-width: 40%;
 }
 
 .hint-row .inline-field
