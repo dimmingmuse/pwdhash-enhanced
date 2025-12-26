@@ -227,35 +227,6 @@ table#theHashForm tr.check-row td.check-input
     margin: 16px;
   }
 
-  table#theHashForm tr,
-  table#theHashForm td
-  {
-    display: block;
-    width: 100%;
-  }
-
-  table#theHashForm tr.check-row
-  {
-    display: table-row;
-  }
-
-  table#theHashForm tr.check-row td
-  {
-    display: table-cell;
-    width: auto;
-  }
-
-  table#theHashForm tr.inline-fields-row
-  {
-    display: table-row;
-  }
-
-  table#theHashForm tr.inline-fields-row td
-  {
-    display: table-cell;
-    width: auto;
-  }
-
   td.stepList
   {
     padding: 0px 0px 12px 0px;
