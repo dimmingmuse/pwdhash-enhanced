@@ -160,6 +160,7 @@ table#theHashForm tr.check-row td.check-label,
 table#theHashForm tr.check-row td.check-input
 {
   text-align: left;
+  padding-left: 5px;
 }
 
 table#theHashForm tr.check-row td.check-label
