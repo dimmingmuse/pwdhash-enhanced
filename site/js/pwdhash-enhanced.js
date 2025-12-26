@@ -20,6 +20,7 @@ function injectInterface() {
     var passRow = passInput.closest('tr');
     var parentTable = passRow.parentNode;
     var refRow = passRow.nextSibling;
+    var insertBeforeRow = refRow ? refRow.nextSibling : null;
 
     // SVG Icons
     var iconNoSym = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg>`;
@@ -121,19 +122,19 @@ function injectInterface() {
     }
 
     // Insert Checkboxes
-    parentTable.insertBefore(createCheckRow("chk-nosym", "Ban Symbols", iconNoSym), refRow);
-    parentTable.insertBefore(createCheckRow("chk-reqnum", "Require Number", "<b>#</b>"), refRow);
-    parentTable.insertBefore(createCheckRow("chk-reqsym", "Require Symbol", "<b>@</b>"), refRow);
-    parentTable.insertBefore(createCheckRow("chk-reqcap", "Require Uppercase", iconCap), refRow);
+    parentTable.insertBefore(createCheckRow("chk-nosym", "Ban Symbols", iconNoSym), insertBeforeRow);
+    parentTable.insertBefore(createCheckRow("chk-reqnum", "Require Number", "<b>#</b>"), insertBeforeRow);
+    parentTable.insertBefore(createCheckRow("chk-reqsym", "Require Symbol", "<b>@</b>"), insertBeforeRow);
+    parentTable.insertBefore(createCheckRow("chk-reqcap", "Require Uppercase", iconCap), insertBeforeRow);
 
     parentTable.insertBefore(createInlineFieldsRow([
-        { id: "ext-minLength", label: "Min Length", type: "number", placeholder: "Default" },
-        { id: "ext-maxLength", label: "Max Length", type: "number", placeholder: "Default" }
-    ]), refRow);
+        { id: "ext-minLength", label: "Min Length", type: "number", placeholder: "None" },
+        { id: "ext-maxLength", label: "Max Length", type: "number", placeholder: "None" }
+    ]), insertBeforeRow);
     parentTable.insertBefore(createSingleFieldRow(
         { id: "ext-hint", label: "Hint", type: "text", placeholder: "Optional" },
         "hint-row"
-    ), refRow);
+    ), insertBeforeRow);
 
     // Insert Copy Button
     var btnRow = document.createElement('tr');
@@ -149,7 +150,7 @@ function injectInterface() {
 
     btnTd.appendChild(btn);
     btnRow.appendChild(btnTd);
-    parentTable.insertBefore(btnRow, refRow.nextSibling);
+    parentTable.insertBefore(btnRow, insertBeforeRow);
 
     ensureCopyNotice();
 }
