@@ -19,8 +19,8 @@ function injectInterface() {
 
     var passRow = passInput.closest('tr');
     var parentTable = passRow.parentNode;
-    var refRow = passRow.nextSibling;
-    var insertBeforeRow = refRow ? refRow.nextSibling : null;
+    var refRow = passRow.nextElementSibling;
+    var insertBeforeRow = refRow ? refRow.nextElementSibling : null;
 
     // SVG Icons
     var iconNoSym = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg>`;
