@@ -30,7 +30,7 @@ table#theHashForm
   margin-right: auto; 
   text-align: center;
   width: 100%;
-  max-width: 520px;
+  max-width: none;
 } 
 
 versionlinks
