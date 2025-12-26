@@ -26,7 +26,9 @@ function Init() {
 	document.hashform.sitePassword.value = "";
 	document.hashform.hashedPassword.value = "Press Generate";
 	document.hashform.hashedPassword.disabled = true;
-	document.hashform.submitButton.type = "submit";
+	if (document.hashform.submitButton) {
+		document.hashform.submitButton.type = "submit";
+	}
 	LoadConfig();
 }
 
@@ -100,4 +102,3 @@ function TimedGenerate() {
 	setTimeout(GenerateToTextField, 0);
 	return false;
 }
-

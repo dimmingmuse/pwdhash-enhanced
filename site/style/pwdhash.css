@@ -30,7 +30,7 @@ table#theHashForm
   margin-right: auto; 
   text-align: center;
   width: 100%;
-  max-width: 520px;
+  max-width: none;
 } 
 
 versionlinks
@@ -90,7 +90,7 @@ div.parameterList
 
 td.stepList 
 { 
-  padding: 0px 5px 0px 5px; 
+  padding: 0px 5px 5px 5px; 
   vertical-align: top; 
 } 
 
@@ -151,6 +151,22 @@ table#theHashForm button
   box-sizing: border-box;
 }
 
+table#theHashForm tr.check-row td.check-label,
+table#theHashForm tr.check-row td.check-input
+{
+  text-align: left;
+}
+
+table#theHashForm tr.check-row td.check-label
+{
+  width: 60%;
+}
+
+table#theHashForm tr.check-row td.check-input
+{
+  width: 40%;
+}
+
 .inline-fields
 {
   display: flex;
@@ -176,6 +192,13 @@ table#theHashForm button
 {
   width: 100%;
   box-sizing: border-box;
+}
+
+.inline-field input.length-input
+{
+  width: 40%;
+  min-width: 3ch;
+  max-width: 40%;
 }
 
 .hint-row .inline-field
@@ -204,38 +227,9 @@ table#theHashForm button
     margin: 16px;
   }
 
-  table#theHashForm tr,
-  table#theHashForm td
-  {
-    display: block;
-    width: 100%;
-  }
-
-  table#theHashForm tr.check-row
-  {
-    display: table-row;
-  }
-
-  table#theHashForm tr.check-row td
-  {
-    display: table-cell;
-    width: auto;
-  }
-
-  table#theHashForm tr.inline-fields-row
-  {
-    display: table-row;
-  }
-
-  table#theHashForm tr.inline-fields-row td
-  {
-    display: table-cell;
-    width: auto;
-  }
-
   td.stepList
   {
-    padding: 0px 0px 12px 0px;
+    padding: 0px 0px 5px 0px;
   }
 
   .gapAfter

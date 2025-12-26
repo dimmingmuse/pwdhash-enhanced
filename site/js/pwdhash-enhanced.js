@@ -19,7 +19,8 @@ function injectInterface() {
 
     var passRow = passInput.closest('tr');
     var parentTable = passRow.parentNode;
-    var refRow = passRow.nextSibling;
+    var refRow = passRow.nextElementSibling;
+    var insertBeforeRow = refRow ? refRow.nextElementSibling : null;
 
     // SVG Icons
     var iconNoSym = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg>`;
@@ -73,6 +74,11 @@ function injectInterface() {
 
         if (type === "number") {
             input.style.width = "100%";
+            if (id === "ext-minLength" || id === "ext-maxLength") {
+                input.classList.add("length-input");
+                input.maxLength = 3;
+                input.setAttribute("maxlength", "3");
+            }
         } else {
             input.style.width = "100%";
         }
@@ -116,53 +122,58 @@ function injectInterface() {
     }
 
     // Insert Checkboxes
-    parentTable.insertBefore(createCheckRow("chk-nosym", "Ban Symbols", iconNoSym), refRow);
-    parentTable.insertBefore(createCheckRow("chk-reqnum", "Require Number", "<b>#</b>"), refRow);
-    parentTable.insertBefore(createCheckRow("chk-reqsym", "Require Symbol", "<b>@</b>"), refRow);
-    parentTable.insertBefore(createCheckRow("chk-reqcap", "Require Uppercase", iconCap), refRow);
+    parentTable.insertBefore(createCheckRow("chk-nosym", "Ban Symbols", iconNoSym), insertBeforeRow);
+    parentTable.insertBefore(createCheckRow("chk-reqnum", "Require Number", "<b>#</b>"), insertBeforeRow);
+    parentTable.insertBefore(createCheckRow("chk-reqsym", "Require Symbol", "<b>@</b>"), insertBeforeRow);
+    parentTable.insertBefore(createCheckRow("chk-reqcap", "Require Uppercase", iconCap), insertBeforeRow);
 
     parentTable.insertBefore(createInlineFieldsRow([
-        { id: "ext-minLength", label: "Min Length", type: "number", placeholder: "Default" },
-        { id: "ext-maxLength", label: "Max Length", type: "number", placeholder: "Default" }
-    ]), refRow);
+        { id: "ext-minLength", label: "Min Length", type: "number", placeholder: "None" },
+        { id: "ext-maxLength", label: "Max Length", type: "number", placeholder: "None" }
+    ]), insertBeforeRow);
     parentTable.insertBefore(createSingleFieldRow(
         { id: "ext-hint", label: "Hint", type: "text", placeholder: "Optional" },
         "hint-row"
-    ), refRow);
+    ), insertBeforeRow);
 
     // Insert Copy Button
     var btnRow = document.createElement('tr');
-    var emptyTd = document.createElement('td');
     var btnTd = document.createElement('td');
+    btnTd.colSpan = 2;
     var btn = document.createElement('button');
     btn.type = "button";
-    btn.innerText = "Copy Link for this Config";
+    btn.innerText = "Copy config link";
     btn.style.marginTop = "8px";
     btn.style.cursor = "pointer";
+    btn.style.whiteSpace = "nowrap";
     btn.onclick = copySafeUrl;
 
     btnTd.appendChild(btn);
-    btnRow.appendChild(emptyTd);
     btnRow.appendChild(btnTd);
-    parentTable.insertBefore(btnRow, refRow);
+    parentTable.insertBefore(btnRow, insertBeforeRow);
 
     ensureCopyNotice();
 }
 
 // --- 2. Listeners ---
 function attachListeners() {
-    // General listeners for hash generation
-    var inputs = document.querySelectorAll('input[type="text"], input[type="password"]');
+    // General listeners for hash regeneration
+    var inputs = document.querySelectorAll('input');
     inputs.forEach(function(el) {
         if (el.id === 'ext-hint') return; // Skip hint field for hash gen
-        el.addEventListener('keyup', function() { setTimeout(processHash, 50); });
-        el.addEventListener('change', function() { setTimeout(processHash, 50); });
+        if (el.name === 'hashedPassword') return;
+        el.addEventListener('input', scheduleRegenerate);
+        el.addEventListener('change', scheduleRegenerate);
     });
 
-    var genBtns = document.querySelectorAll('button, input[type="button"], input[type="submit"]');
-    genBtns.forEach(function(btn) {
-        btn.addEventListener('click', function() { setTimeout(processHash, 50); });
-    });
+    var hashField = document.getElementById('hashedPassword') || document.getElementsByName('hashedPassword')[0];
+    if (hashField) {
+        hashField.addEventListener('click', function() {
+            if (hashField.value && hashField.value !== "Press Generate") {
+                copyGeneratedPassword(hashField.value);
+            }
+        });
+    }
 
     // Specific listener for Page Title updates (Site Keyword field)
     // We use :not(#ext-hint) to ensure we don't grab the hint field by mistake
@@ -193,6 +204,25 @@ function processHash() {
     }
 
     applyConstraints();
+}
+
+var regenerateTimer;
+function scheduleRegenerate() {
+    if (regenerateTimer) clearTimeout(regenerateTimer);
+    regenerateTimer = setTimeout(regenerateHash, 50);
+}
+
+function regenerateHash() {
+    if (typeof GenerateToTextField === 'function') {
+        GenerateToTextField();
+    } else if (typeof Generate === 'function') {
+        var hashField = document.getElementById('hashedPassword') || document.getElementsByName('hashedPassword')[0];
+        if (hashField) {
+            hashField.value = Generate();
+            hashField.disabled = false;
+        }
+    }
+    processHash();
 }
 
 function applyConstraints() {
@@ -270,9 +300,6 @@ function applyConstraints() {
 
     hashField.value = result;
     hashField.setAttribute('data-last-output', result);
-    if (result && result !== previousOutput) {
-        copyGeneratedPassword(result);
-    }
 }
 
 function copyGeneratedPassword(password) {
