@@ -172,6 +172,11 @@ table#theHashForm tr.check-row td.check-input
   width: 40%;
 }
 
+table#theHashForm .copy-button
+{
+  width: auto;
+}
+
 .inline-fields
 {
   display: flex;
@@ -246,7 +251,8 @@ table#theHashForm tr.check-row td.check-input
 .hashed-password-row input
 {
   flex: 1 1 auto;
-  width: auto;
+  width: 100%;
+  min-width: 0;
 }
 
 .copy-button
