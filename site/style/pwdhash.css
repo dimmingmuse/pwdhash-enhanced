@@ -269,18 +269,6 @@ table#theHashForm tr.check-row td.check-input
 
 @media (max-width: 360px)
 {
-  table#theHashForm tr.check-row,
-  table#theHashForm tr.check-row td
-  {
-    display: block;
-    width: 100%;
-  }
-
-  table#theHashForm tr.check-row td.check-input
-  {
-    padding-top: 4px;
-  }
-
   .inline-fields
   {
     gap: 6px;
