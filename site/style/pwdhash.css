@@ -29,6 +29,8 @@ table#theHashForm
   margin-left: auto; 
   margin-right: auto; 
   text-align: center;
+  width: 100%;
+  max-width: 520px;
 } 
 
 versionlinks
@@ -132,11 +134,45 @@ div.footer
 
 .leftmargin
 {
-  margin: 3em 1em 1em 1em;
+  margin: 3em auto 1em auto;
 }
 
 .textcentre {
   text-align: center;
 }
 
+table#theHashForm input[type="text"],
+table#theHashForm input[type="password"],
+table#theHashForm input[type="number"],
+table#theHashForm input[type="button"],
+table#theHashForm button
+{
+  width: 100%;
+  box-sizing: border-box;
+}
+
+@media (max-width: 700px)
+{
+  body
+  {
+    margin: 16px;
+  }
+
+  table#theHashForm tr,
+  table#theHashForm td
+  {
+    display: block;
+    width: 100%;
+  }
+
+  td.stepList
+  {
+    padding: 0px 0px 12px 0px;
+  }
+
+  .gapAfter
+  {
+    padding-bottom: 8px !important;
+  }
+}
 
