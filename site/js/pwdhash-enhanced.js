@@ -122,8 +122,8 @@ function injectInterface() {
     parentTable.insertBefore(createCheckRow("chk-reqcap", "Require Uppercase", iconCap), refRow);
 
     parentTable.insertBefore(createInlineFieldsRow([
-        { id: "ext-maxLength", label: "Max Length", type: "number", placeholder: "Default" },
-        { id: "ext-minLength", label: "Min Length", type: "number", placeholder: "Default" }
+        { id: "ext-minLength", label: "Min Length", type: "number", placeholder: "Default" },
+        { id: "ext-maxLength", label: "Max Length", type: "number", placeholder: "Default" }
     ]), refRow);
     parentTable.insertBefore(createSingleFieldRow(
         { id: "ext-hint", label: "Hint", type: "text", placeholder: "Optional" },

@@ -156,11 +156,12 @@ table#theHashForm button
   display: flex;
   gap: 8px;
   align-items: flex-end;
+  width: 100%;
 }
 
 .inline-field
 {
-  flex: 1;
+  flex: 1 1 0;
   min-width: 0;
   text-align: left;
 }
@@ -169,6 +170,12 @@ table#theHashForm button
 {
   display: block;
   font-size: 70%;
+}
+
+.inline-field input
+{
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .hint-row .inline-field
