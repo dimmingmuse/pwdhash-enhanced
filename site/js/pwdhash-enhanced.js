@@ -139,6 +139,7 @@ function injectInterface() {
 
     // Insert Copy Button
     var btnRow = document.createElement('tr');
+    btnRow.className = "copy-config-row";
     var btnTd = document.createElement('td');
     btnTd.colSpan = 2;
     var btn = document.createElement('button');

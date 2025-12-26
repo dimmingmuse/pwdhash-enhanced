@@ -163,6 +163,13 @@ table#theHashForm tr.check-row td.check-input
   padding-left: 5px;
 }
 
+table#theHashForm tr.inline-fields-row td,
+table#theHashForm tr.hint-row td,
+table#theHashForm tr.copy-config-row td
+{
+  padding-left: 5px;
+}
+
 table#theHashForm tr.check-row td.check-label
 {
   width: 60%;
