@@ -73,6 +73,9 @@ function injectInterface() {
 
         if (type === "number") {
             input.style.width = "100%";
+            if (id === "ext-minLength" || id === "ext-maxLength") {
+                input.classList.add("length-input");
+            }
         } else {
             input.style.width = "100%";
         }

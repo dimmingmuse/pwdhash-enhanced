@@ -178,6 +178,13 @@ table#theHashForm button
   box-sizing: border-box;
 }
 
+.inline-field input.length-input
+{
+  width: 3ch;
+  min-width: 3ch;
+  max-width: 3ch;
+}
+
 .hint-row .inline-field
 {
   width: 100%;
