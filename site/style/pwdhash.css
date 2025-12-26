@@ -185,6 +185,48 @@ table#theHashForm .copy-button
   width: auto;
 }
 
+.keyword-row
+{
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+}
+
+.keyword-row input
+{
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+}
+
+.keyword-clear
+{
+  border: 1px solid #bdbdbd;
+  background: #f6f6f6;
+  border-radius: 6px;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+}
+
+.keyword-clear:hover,
+.keyword-clear:focus
+{
+  background: #eeeeee;
+}
+
+.keyword-clear:disabled
+{
+  opacity: 0.5;
+  cursor: default;
+}
+
 .inline-fields
 {
   display: flex;
