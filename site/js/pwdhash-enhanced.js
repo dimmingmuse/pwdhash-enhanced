@@ -139,6 +139,7 @@ function injectInterface() {
 
     // Insert Copy Button
     var btnRow = document.createElement('tr');
+    btnRow.className = "copy-config-row";
     var btnTd = document.createElement('td');
     btnTd.colSpan = 2;
     var btn = document.createElement('button');
@@ -281,58 +282,86 @@ function applyConstraints() {
 
     var result = fullHash;
 
-    // 1. Filter: Ban Symbols
-    if (noSym) {
-        result = result.replace(/[^a-zA-Z0-9]/g, '');
-        if (result.length === 0) result = "Res" + fullHash.length; 
-    }
-
-    // 2. Pad: Min Length
-    if (!isNaN(min) && min > 0) {
-        while (result.length < min) {
-            result += result;
-        }
-    }
-
-    // 3. Truncate: Max Length
-    if (!isNaN(max) && max > 0 && result.length > max) {
-        result = result.substring(0, max);
-    }
-
-    // 4. Enforce Uppercase
-    if (reqCap && !/[A-Z]/.test(result)) {
-        if (/[a-z]/.test(result)) {
-            result = result.replace(/[a-z]/, function(c) { return c.toUpperCase(); });
-        } else {
-            var caps = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-            var char = caps.charAt(result.charCodeAt(0) % caps.length);
-            if (!isNaN(max) && max > 0 && result.length >= max) {
-                result = char + result.substring(1);
-            } else {
-                result = char + result;
+    function applyLengthConstraints() {
+        // Pad: Min Length
+        if (!isNaN(min) && min > 0) {
+            while (result.length < min) {
+                result += result;
             }
         }
+
+        // Truncate: Max Length
+        if (!isNaN(max) && max > 0 && result.length > max) {
+            result = result.substring(0, max);
+        }
     }
 
-    // 5. Enforce Number & Symbol
-    var suffix = "";
+    // 1. Pad/Truncate to Length Constraints
+    applyLengthConstraints();
 
-    if (reqNum && !/\d/.test(result)) {
-        suffix += (result.length % 10).toString();
+    // 3. Filter: Ban Symbols
+    if (noSym) {
+        result = result.replace(/[^a-zA-Z0-9]/g, '');
+        if (result.length === 0) result = "Res" + fullHash.length;
     }
 
-    if (reqSym && !noSym && !/[^a-zA-Z0-9]/.test(result)) {
-        var syms = "!@#$%^&*";
-        suffix += syms.charAt(result.charCodeAt(0) % syms.length);
-    }
+    // Re-apply length constraints after filtering to honor min/max limits.
+    applyLengthConstraints();
 
-    if (suffix.length > 0) {
-        if (!isNaN(max) && max > 0) {
-            var cutLen = max - suffix.length;
-            if (cutLen < 0) cutLen = 0; 
-            result = result.substring(0, cutLen) + suffix;
+    function insertOrReplace(char, avoidRegexes) {
+        if (!isNaN(max) && max > 0 && result.length >= max) {
+            var index = -1;
+            for (var i = 0; i < result.length; i++) {
+                var shouldAvoid = avoidRegexes && avoidRegexes.some(function(regex) {
+                    return regex.test(result[i]);
+                });
+                if (!shouldAvoid) {
+                    index = i;
+                    break;
+                }
+            }
+            if (index === -1) index = result.length - 1;
+            result = result.substring(0, index) + char + result.substring(index + 1);
         } else {
-            result += suffix;
+            result += char;
+        }
+    }
+
+    var requiredTypes = 0;
+    if (reqCap) requiredTypes += 1;
+    if (reqNum) requiredTypes += 1;
+    if (reqSym && !noSym) requiredTypes += 1;
+    var canEnforceAll = isNaN(max) || max === 0 || max >= requiredTypes;
+
+    if (canEnforceAll) {
+        // 4. Enforce Uppercase
+        if (reqCap && !/[A-Z]/.test(result)) {
+            if (/[a-z]/.test(result)) {
+                result = result.replace(/[a-z]/, function(c) { return c.toUpperCase(); });
+            } else {
+                var caps = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                var upperChar = caps.charAt(result.charCodeAt(0) % caps.length);
+                insertOrReplace(upperChar);
+            }
+        }
+
+        // 5. Enforce Number
+        if (reqNum && !/\d/.test(result)) {
+            var numberChar = (result.length % 10).toString();
+            var avoidForNumber = [];
+            if (reqCap) avoidForNumber.push(/[A-Z]/);
+            if (reqSym && !noSym) avoidForNumber.push(/[^a-zA-Z0-9]/);
+            insertOrReplace(numberChar, avoidForNumber);
+        }
+
+        // 6. Enforce Symbol
+        if (reqSym && !noSym && !/[^a-zA-Z0-9]/.test(result)) {
+            var syms = "!@#$%^&*";
+            var symbolChar = syms.charAt(result.charCodeAt(0) % syms.length);
+            var avoidForSymbol = [];
+            if (reqCap) avoidForSymbol.push(/[A-Z]/);
+            if (reqNum) avoidForSymbol.push(/\d/);
+            insertOrReplace(symbolChar, avoidForSymbol);
         }
     }
 
