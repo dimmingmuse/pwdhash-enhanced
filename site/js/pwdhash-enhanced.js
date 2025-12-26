@@ -156,18 +156,23 @@ function injectInterface() {
 
 // --- 2. Listeners ---
 function attachListeners() {
-    // General listeners for hash generation
-    var inputs = document.querySelectorAll('input[type="text"], input[type="password"]');
+    // General listeners for hash regeneration
+    var inputs = document.querySelectorAll('input');
     inputs.forEach(function(el) {
         if (el.id === 'ext-hint') return; // Skip hint field for hash gen
-        el.addEventListener('keyup', function() { setTimeout(processHash, 50); });
-        el.addEventListener('change', function() { setTimeout(processHash, 50); });
+        if (el.name === 'hashedPassword') return;
+        el.addEventListener('input', scheduleRegenerate);
+        el.addEventListener('change', scheduleRegenerate);
     });
 
-    var genBtns = document.querySelectorAll('button, input[type="button"], input[type="submit"]');
-    genBtns.forEach(function(btn) {
-        btn.addEventListener('click', function() { setTimeout(processHash, 50); });
-    });
+    var hashField = document.getElementById('hashedPassword') || document.getElementsByName('hashedPassword')[0];
+    if (hashField) {
+        hashField.addEventListener('click', function() {
+            if (hashField.value && hashField.value !== "Press Generate") {
+                copyGeneratedPassword(hashField.value);
+            }
+        });
+    }
 
     // Specific listener for Page Title updates (Site Keyword field)
     // We use :not(#ext-hint) to ensure we don't grab the hint field by mistake
@@ -198,6 +203,25 @@ function processHash() {
     }
 
     applyConstraints();
+}
+
+var regenerateTimer;
+function scheduleRegenerate() {
+    if (regenerateTimer) clearTimeout(regenerateTimer);
+    regenerateTimer = setTimeout(regenerateHash, 50);
+}
+
+function regenerateHash() {
+    if (typeof GenerateToTextField === 'function') {
+        GenerateToTextField();
+    } else if (typeof Generate === 'function') {
+        var hashField = document.getElementById('hashedPassword') || document.getElementsByName('hashedPassword')[0];
+        if (hashField) {
+            hashField.value = Generate();
+            hashField.disabled = false;
+        }
+    }
+    processHash();
 }
 
 function applyConstraints() {
@@ -275,9 +299,6 @@ function applyConstraints() {
 
     hashField.value = result;
     hashField.setAttribute('data-last-output', result);
-    if (result && result !== previousOutput) {
-        copyGeneratedPassword(result);
-    }
 }
 
 function copyGeneratedPassword(password) {
