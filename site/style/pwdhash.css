@@ -226,18 +226,23 @@ table#theHashForm .copy-button
   border-radius: 6px;
   padding: 6px 10px;
   opacity: 0;
-  margin-top: 8px;
   display: inline-flex;
   gap: 6px;
   align-items: center;
   transition: opacity 0.2s ease, transform 0.2s ease;
   transform: translateY(-4px);
+  position: fixed;
+  left: 50%;
+  top: 0;
+  transform: translate(-50%, -4px);
+  pointer-events: none;
+  z-index: 1000;
 }
 
 .copy-notice.show
 {
   opacity: 1;
-  transform: translateY(0);
+  transform: translate(-50%, 0);
 }
 
 .hashed-password-row

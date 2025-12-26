@@ -369,11 +369,20 @@ var copyNoticeTimer;
 function showCopyNotice() {
     var notice = ensureCopyNotice();
     if (!notice) return;
+    positionCopyNotice(notice);
     notice.classList.add('show');
     if (copyNoticeTimer) clearTimeout(copyNoticeTimer);
     copyNoticeTimer = setTimeout(function() {
         notice.classList.remove('show');
     }, 2400);
+}
+
+function positionCopyNotice(notice) {
+    var hashedSection = document.getElementById('theHashedPassword');
+    if (!hashedSection) return;
+    var rect = hashedSection.getBoundingClientRect();
+    notice.style.left = (rect.left + rect.width / 2) + "px";
+    notice.style.top = (rect.bottom - 8) + "px";
 }
 
 function configureHashedPasswordField(hashField) {
