@@ -21,6 +21,7 @@ function injectInterface() {
     var parentTable = passRow.parentNode;
     var refRow = passRow.nextElementSibling;
     var insertBeforeRow = refRow ? refRow.nextElementSibling : null;
+    var hashField = document.getElementsByName('hashedPassword')[0];
 
     // SVG Icons
     var iconNoSym = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg>`;
@@ -122,9 +123,9 @@ function injectInterface() {
     }
 
     // Insert Checkboxes
+    parentTable.insertBefore(createCheckRow("chk-reqsym", "Require Symbol", "<b>@</b>"), insertBeforeRow);
     parentTable.insertBefore(createCheckRow("chk-nosym", "Ban Symbols", iconNoSym), insertBeforeRow);
     parentTable.insertBefore(createCheckRow("chk-reqnum", "Require Number", "<b>#</b>"), insertBeforeRow);
-    parentTable.insertBefore(createCheckRow("chk-reqsym", "Require Symbol", "<b>@</b>"), insertBeforeRow);
     parentTable.insertBefore(createCheckRow("chk-reqcap", "Require Uppercase", iconCap), insertBeforeRow);
 
     parentTable.insertBefore(createInlineFieldsRow([
@@ -152,6 +153,7 @@ function injectInterface() {
     btnRow.appendChild(btnTd);
     parentTable.insertBefore(btnRow, insertBeforeRow);
 
+    insertHashedPasswordCopyButton(hashField);
     ensureCopyNotice();
 }
 
@@ -168,6 +170,7 @@ function attachListeners() {
 
     var hashField = document.getElementById('hashedPassword') || document.getElementsByName('hashedPassword')[0];
     if (hashField) {
+        configureHashedPasswordField(hashField);
         hashField.addEventListener('click', function() {
             if (hashField.value && hashField.value !== "Press Generate") {
                 copyGeneratedPassword(hashField.value);
@@ -187,6 +190,39 @@ function attachListeners() {
         siteInput.addEventListener('input', updateTitle);
         siteInput.addEventListener('keyup', updateTitle);
         siteInput.addEventListener('change', updateTitle);
+    }
+
+    var noSymInput = document.getElementById('chk-nosym');
+    var reqSymInput = document.getElementById('chk-reqsym');
+    if (noSymInput && reqSymInput) {
+        noSymInput.addEventListener('change', function() {
+            if (noSymInput.checked) {
+                reqSymInput.checked = false;
+            }
+            applyConstraints();
+        });
+        reqSymInput.addEventListener('change', function() {
+            if (reqSymInput.checked) {
+                noSymInput.checked = false;
+            }
+            applyConstraints();
+        });
+    }
+
+    var minInput = document.getElementById('ext-minLength');
+    var maxInput = document.getElementById('ext-maxLength');
+    var iterationInput = document.getElementsByName('iterations')[0];
+    if (minInput) {
+        minInput.addEventListener('input', function() { validateNumberInput(minInput, { minValue: 0 }); });
+        minInput.addEventListener('change', function() { validateNumberInput(minInput, { minValue: 0 }); });
+    }
+    if (maxInput) {
+        maxInput.addEventListener('input', function() { validateNumberInput(maxInput, { minValue: 0 }); });
+        maxInput.addEventListener('change', function() { validateNumberInput(maxInput, { minValue: 0 }); });
+    }
+    if (iterationInput) {
+        iterationInput.addEventListener('input', function() { validateNumberInput(iterationInput, { minValue: 1 }); });
+        iterationInput.addEventListener('change', function() { validateNumberInput(iterationInput, { minValue: 1 }); });
     }
 }
 
@@ -238,8 +274,10 @@ function applyConstraints() {
     var reqNum = document.getElementById('chk-reqnum').checked;
     var reqSym = document.getElementById('chk-reqsym').checked;
     var reqCap = document.getElementById('chk-reqcap').checked;
-    var min = parseInt(document.getElementById('ext-minLength').value);
-    var max = parseInt(document.getElementById('ext-maxLength').value);
+    var minInput = document.getElementById('ext-minLength');
+    var maxInput = document.getElementById('ext-maxLength');
+    var min = getValidatedNumber(minInput, { minValue: 0 });
+    var max = getValidatedNumber(maxInput, { minValue: 0 });
 
     var result = fullHash;
 
@@ -319,7 +357,9 @@ function ensureCopyNotice() {
     var notice = document.createElement('div');
     notice.id = "copy-notice";
     notice.className = "copy-notice";
-    notice.innerText = "Password copied";
+    notice.innerText = "Password copied to clipboard.";
+    notice.setAttribute('role', 'status');
+    notice.setAttribute('aria-live', 'polite');
 
     hashedSection.appendChild(notice);
     return notice;
@@ -329,11 +369,75 @@ var copyNoticeTimer;
 function showCopyNotice() {
     var notice = ensureCopyNotice();
     if (!notice) return;
+    positionCopyNotice(notice);
     notice.classList.add('show');
     if (copyNoticeTimer) clearTimeout(copyNoticeTimer);
     copyNoticeTimer = setTimeout(function() {
         notice.classList.remove('show');
-    }, 1600);
+    }, 2400);
+}
+
+function positionCopyNotice(notice) {
+    var hashedSection = document.getElementById('theHashedPassword');
+    if (!hashedSection) return;
+    var rect = hashedSection.getBoundingClientRect();
+    notice.style.left = (rect.left + rect.width / 2) + "px";
+    notice.style.top = (rect.bottom - 8) + "px";
+}
+
+function configureHashedPasswordField(hashField) {
+    var hintText = "Click the copy button to copy the password";
+    hashField.placeholder = hintText;
+    hashField.title = hintText;
+    hashField.setAttribute('aria-label', hintText);
+    hashField.setAttribute('aria-describedby', 'copy-notice');
+}
+
+function getValidatedNumber(input, options) {
+    if (!input) return NaN;
+    var raw = input.value.trim();
+    if (!raw) return NaN;
+    var num = Number(raw);
+    if (!Number.isFinite(num) || num < options.minValue) {
+        input.value = "";
+        return NaN;
+    }
+    if (!Number.isInteger(num)) {
+        num = Math.floor(num);
+        input.value = num.toString();
+    }
+    return num;
+}
+
+function validateNumberInput(input, options) {
+    getValidatedNumber(input, options);
+}
+
+function insertHashedPasswordCopyButton(hashField) {
+    if (!hashField) return;
+    var existing = document.getElementById('hashedPasswordCopyButton');
+    if (existing) return;
+
+    var row = document.createElement('div');
+    row.className = 'hashed-password-row';
+
+    var button = document.createElement('button');
+    button.type = 'button';
+    button.id = 'hashedPasswordCopyButton';
+    button.className = 'copy-button';
+    button.setAttribute('aria-label', 'Copy hashed password');
+    button.title = 'Copy hashed password';
+    button.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="9" y="9" width="11" height="11" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
+    button.addEventListener('click', function() {
+        if (hashField.value && hashField.value !== "Press Generate") {
+            copyGeneratedPassword(hashField.value);
+        }
+    });
+
+    var parent = hashField.parentNode;
+    parent.insertBefore(row, hashField);
+    row.appendChild(hashField);
+    row.appendChild(button);
 }
 
 // --- 4. URL State ---

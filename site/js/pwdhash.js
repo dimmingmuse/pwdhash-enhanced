@@ -24,7 +24,7 @@
 function Init() {
 	document.hashform.domain.value = "";
 	document.hashform.sitePassword.value = "";
-	document.hashform.hashedPassword.value = "Press Generate";
+	document.hashform.hashedPassword.value = "";
 	document.hashform.hashedPassword.disabled = true;
 	if (document.hashform.submitButton) {
 		document.hashform.submitButton.type = "submit";
@@ -42,6 +42,10 @@ function Generate()
 	StoreConfig();
 	var salt = document.hashform.salt.value;
 	var iterations = Number(document.hashform.iterations.value);
+	if (!Number.isFinite(iterations) || iterations <= 0) {
+		iterations = 5000;
+		document.hashform.iterations.value = iterations;
+	}
 	var uri = document.hashform.domain.value;
 	var domain = (new SPH_DomainExtractor()).extractDomain(uri);
 	var size = SPH_kPasswordPrefix.length;
@@ -69,7 +73,12 @@ function StoreConfig()
 {
 	if (typeof(Storage) !== "undefined") {
 		localStorage.salt = document.hashform.salt.value;
-		localStorage.iterations = Number(document.hashform.iterations.value);
+		var iterations = Number(document.hashform.iterations.value);
+		if (!Number.isFinite(iterations) || iterations <= 0) {
+			iterations = 5000;
+			document.hashform.iterations.value = iterations;
+		}
+		localStorage.iterations = iterations;
 	}
 }
 
