@@ -103,6 +103,18 @@ function injectInterface() {
         return tr;
     }
 
+    function createSingleFieldRow(field, rowClass) {
+        var tr = document.createElement('tr');
+        tr.className = rowClass || "";
+
+        var td = document.createElement('td');
+        td.colSpan = 2;
+        td.appendChild(createInlineField(field.id, field.label, field.type, field.placeholder));
+
+        tr.appendChild(td);
+        return tr;
+    }
+
     // Insert Checkboxes
     parentTable.insertBefore(createCheckRow("chk-nosym", "Ban Symbols", iconNoSym), refRow);
     parentTable.insertBefore(createCheckRow("chk-reqnum", "Require Number", "<b>#</b>"), refRow);
@@ -111,9 +123,12 @@ function injectInterface() {
 
     parentTable.insertBefore(createInlineFieldsRow([
         { id: "ext-maxLength", label: "Max Length", type: "number", placeholder: "Default" },
-        { id: "ext-minLength", label: "Min Length", type: "number", placeholder: "Default" },
-        { id: "ext-hint", label: "Hint", type: "text", placeholder: "Optional" }
+        { id: "ext-minLength", label: "Min Length", type: "number", placeholder: "Default" }
     ]), refRow);
+    parentTable.insertBefore(createSingleFieldRow(
+        { id: "ext-hint", label: "Hint", type: "text", placeholder: "Optional" },
+        "hint-row"
+    ), refRow);
 
     // Insert Copy Button
     var btnRow = document.createElement('tr');
@@ -130,6 +145,8 @@ function injectInterface() {
     btnRow.appendChild(emptyTd);
     btnRow.appendChild(btnTd);
     parentTable.insertBefore(btnRow, refRow);
+
+    ensureCopyNotice();
 }
 
 // --- 2. Listeners ---
@@ -260,7 +277,36 @@ function applyConstraints() {
 
 function copyGeneratedPassword(password) {
     if (!navigator.clipboard || !navigator.clipboard.writeText) return;
-    navigator.clipboard.writeText(password).catch(function() {});
+    navigator.clipboard.writeText(password).then(function() {
+        showCopyNotice();
+    }).catch(function() {});
+}
+
+function ensureCopyNotice() {
+    var existing = document.getElementById('copy-notice');
+    if (existing) return existing;
+
+    var hashedSection = document.getElementById('theHashedPassword');
+    if (!hashedSection) return null;
+
+    var notice = document.createElement('div');
+    notice.id = "copy-notice";
+    notice.className = "copy-notice";
+    notice.innerText = "Password copied";
+
+    hashedSection.appendChild(notice);
+    return notice;
+}
+
+var copyNoticeTimer;
+function showCopyNotice() {
+    var notice = ensureCopyNotice();
+    if (!notice) return;
+    notice.classList.add('show');
+    if (copyNoticeTimer) clearTimeout(copyNoticeTimer);
+    copyNoticeTimer = setTimeout(function() {
+        notice.classList.remove('show');
+    }, 1600);
 }
 
 // --- 4. URL State ---

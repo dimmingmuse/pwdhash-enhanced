@@ -171,6 +171,25 @@ table#theHashForm button
   font-size: 70%;
 }
 
+.hint-row .inline-field
+{
+  width: 100%;
+}
+
+.copy-notice
+{
+  font-size: 70%;
+  color: green;
+  opacity: 0;
+  margin-top: 6px;
+  transition: opacity 0.2s ease;
+}
+
+.copy-notice.show
+{
+  opacity: 1;
+}
+
 @media (max-width: 700px)
 {
   body
@@ -215,5 +234,18 @@ table#theHashForm button
   .gapAfter
   {
     padding-bottom: 8px !important;
+  }
+}
+
+@media (max-width: 360px)
+{
+  .inline-fields
+  {
+    gap: 6px;
+  }
+
+  .inline-field label
+  {
+    font-size: 65%;
   }
 }
