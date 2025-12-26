@@ -230,11 +230,16 @@ table#theHashForm tr.check-row td.check-input
   transform: translateY(0);
 }
 
-.hashed-password-actions
+.hashed-password-row
 {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  margin-left: 6px;
+  gap: 6px;
+}
+
+.hashed-password-row input
+{
+  flex: 1 1 auto;
 }
 
 .copy-button
@@ -244,14 +249,25 @@ table#theHashForm tr.check-row td.check-input
   border-radius: 6px;
   padding: 4px 6px;
   cursor: pointer;
-  font-size: 14px;
   line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .copy-button:hover,
 .copy-button:focus
 {
   background: #eeeeee;
+}
+
+.copy-button svg
+{
+  width: 16px;
+  height: 16px;
+  stroke: #333;
+  stroke-width: 2;
+  fill: none;
 }
 
 @media (max-width: 700px)

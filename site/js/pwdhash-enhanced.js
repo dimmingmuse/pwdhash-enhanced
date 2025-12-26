@@ -409,8 +409,8 @@ function insertHashedPasswordCopyButton(hashField) {
     var existing = document.getElementById('hashedPasswordCopyButton');
     if (existing) return;
 
-    var wrapper = document.createElement('div');
-    wrapper.className = 'hashed-password-actions';
+    var row = document.createElement('div');
+    row.className = 'hashed-password-row';
 
     var button = document.createElement('button');
     button.type = 'button';
@@ -418,7 +418,7 @@ function insertHashedPasswordCopyButton(hashField) {
     button.className = 'copy-button';
     button.setAttribute('aria-label', 'Copy hashed password');
     button.title = 'Copy hashed password';
-    button.innerText = '📋';
+    button.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="9" y="9" width="11" height="11" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
     button.addEventListener('click', function() {
         if (hashField.value && hashField.value !== "Press Generate") {
             copyGeneratedPassword(hashField.value);
@@ -426,8 +426,9 @@ function insertHashedPasswordCopyButton(hashField) {
     });
 
     var parent = hashField.parentNode;
-    parent.insertBefore(wrapper, hashField.nextSibling);
-    wrapper.appendChild(button);
+    parent.insertBefore(row, hashField);
+    row.appendChild(hashField);
+    row.appendChild(button);
 }
 
 // --- 4. URL State ---
