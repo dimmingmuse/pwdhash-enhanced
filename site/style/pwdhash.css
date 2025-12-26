@@ -157,6 +157,16 @@ table#theHashForm tr.check-row td.check-input
   text-align: left;
 }
 
+table#theHashForm tr.check-row td.check-label
+{
+  width: 60%;
+}
+
+table#theHashForm tr.check-row td.check-input
+{
+  width: 40%;
+}
+
 .inline-fields
 {
   display: flex;
