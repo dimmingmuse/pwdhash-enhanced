@@ -20,7 +20,7 @@
       * Distributed under the BSD License
       * See http://crypto.stanford.edu/PwdHash for more info.
       *-->
-  <title>PwdHash PoC</title>
+  <title>PwdHash Enhanced</title>
   <script src="js/forge.min.js"></script>
 
   <script src="js/pwdhash.js" type="text/javascript"></script>
@@ -92,46 +92,29 @@ Config is stored locally in your browser across sessions
 <div class="footer">Tip: You can save this page to disk.</div>
 </td></tr></table>
 
-<p align="center"><img src="images/cambridge_crest64.png"
-   alt="Stanford" align="center" width="64" height="64"> </p>
-
-<h1 class="main-title">Cambridge PwdHash PoC</h1>
+<h1 class="main-title">PwdHash Enhanced</h1>
 	            
 <div id="theexplanation">
 <p>
-PwdHash generates password mutations. It's a proof-of-concept alteration of the original <a href="https://www.pwdhash.com">Stanford PwdHash</a>, but with a number of improvements that fix some of the weaknesses of the original. PwdHash-PoC uses the <a href="https://github.com/digitalbazaar/forge">Forge</a> implementation of PBKDF2-SHA512 to generate hashes.</p>
+PwdHash Enhanced generates site-specific passwords from a master password. It builds on <a href="http://www.flypig.co.uk/pwdhash/">Cambridge's PwdHash-PoC</a>, which itself improved upon the original <a href="https://www.pwdhash.com">Stanford PwdHash</a>. This version adds configurable password requirements (length limits, character rules) and auto-detection of common site policies.</p>
 
 <p>PwdHash will not turn a weak password into a strong one. <b>Always ensure your master password is sufficiently complex</b>.</p>
 
 <h3>Bookmarklet</h3>
 <p>Drag this link to your bookmarks bar: <a href="javascript:(function(){var n='pwdhash_window',b='https://dimmingmuse.github.io/pwdhash-enhanced/site/',f='location=yes,height=420,width=340,scrollbars=yes,status=yes',d=(location.hostname||'').replace(/^www\./,''),u=b+(d?'?site='+encodeURIComponent(d):''),w=window.open(u,n,f);w.focus();})();">PwdHash</a></p>
 
-<h3>Resources</h3>
+<h3>Background</h3>
 <ul>
-<li>Visit the original <a href="https://www.pwdhash.com">PwdHash website</a>.</li>
-<li>Visit the <a href="http://www.cl.cam.ac.uk/research/security/">Cambridge Security Group website</a>.</li>
-<li>Read the <a href="http://www.flypig.co.uk/papers/dlj-gr-passwords16.pdf">Cracking PwdHash paper</a> (PDF).</li>
-<li>View the <a href="http://www.flypig.co.uk/presentations/dlj-gr-passwords2016.pdf">Passwords16 presentation</a> (PDF).</li>
-<li>Get the <a href="https://chrome.google.com/webstore/detail/pwdhash-poc-port/lofhgnhbjellcpcdpkbejffjejhchacj">Chrome extension</a>, updated by <a href="https://github.com/CyBot">CyBot</a> to include these changes.
-
-<li>Send us <a href="mailto:David.Llewellyn-Jones@cl.cam.ac.uk">feedback</a>.</li>
+<li>Original <a href="https://www.pwdhash.com">Stanford PwdHash</a> (2004-2005) by Dan Boneh, Collin Jackson, John Mitchell, Nick Miyake, and Blake Ross</li>
+<li><a href="http://www.flypig.co.uk/pwdhash/">Cambridge PwdHash-PoC</a> (2016) by <a href="http://www.cl.cam.ac.uk/~dl551/">David Llewellyn-Jones</a> and <a href="https://www.cl.cam.ac.uk/people/#gr348">Graham Rymer</a> — fixed flaws in original, uses PBKDF2-SHA512</li>
+<li><a href="http://www.flypig.co.uk/papers/dlj-gr-passwords16.pdf">Cracking PwdHash paper</a> (PDF)</li>
+<li><a href="https://chrome.google.com/webstore/detail/pwdhash-poc-port/lofhgnhbjellcpcdpkbejffjejhchacj">Chrome extension</a> by <a href="https://github.com/CyBot">CyBot</a></li>
 </ul>
 </div>
 </form>
 
-<div class="textcentre">
- PwdHash-PoC authors: <a href="http://www.cl.cam.ac.uk/~dl551/">David Llewellyn-Jones</a>,
-    <a href="https://www.cl.cam.ac.uk/people/#gr348">Graham Rymer</a>
-</div>
-
-
-<div class="textcentre">
- Original PwdHash authors: <a href="http://www.blakeross.com/">Blake Ross</a>,
-    <a href="http://www.collinjackson.com/">Collin Jackson</a>,
-      Nicholas Miyake,
-        <A href="http://crypto.stanford.edu/~dabo/">Dan Boneh</A> and <A 
-	  href="http://theory.stanford.edu/people/jcm/home.html">John C. 
-	    Mitchell</A>
+<div class="textcentre footer-attribution">
+ Enhanced version modifications are not affiliated with Cambridge or Stanford.
 </div>
 <script src="js/pwdhash-enhanced.js"></script>
 </body>

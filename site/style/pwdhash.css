@@ -152,6 +152,12 @@ div.footer
   text-align: center;
 }
 
+.footer-attribution {
+  font-size: smaller;
+  color: #666;
+  margin-top: 1em;
+}
+
 table#theHashForm input[type="text"],
 table#theHashForm input[type="password"],
 table#theHashForm input[type="number"],
