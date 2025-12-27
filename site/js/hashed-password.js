@@ -41,7 +41,8 @@ SPH_HashedPassword.prototype = {
   _getHashedPassword: function(password, realm, salt, iterations) {
     var size = password.length + SPH_kPasswordPrefix.length;
     //var hash = b64_hmac_md5(password, realm);
-	var hash = forge.util.encode64(forge.pkcs5.pbkdf2(password + salt, realm, iterations, (2 * size / 3) + 16, forge.sha256.create()));
+	var derivedBytes = Math.ceil((2 * size / 3) + 16);
+	var hash = forge.util.encode64(forge.pkcs5.pbkdf2(password + salt, realm, iterations, derivedBytes, forge.sha256.create()));
 
     var nonalphanumeric = password.match(/\W/) != null;
     var result = this._applyConstraints(hash, size, nonalphanumeric);

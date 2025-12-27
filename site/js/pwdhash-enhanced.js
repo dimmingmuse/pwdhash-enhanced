@@ -8,6 +8,7 @@ window.addEventListener('load', function() {
     console.log("PwdHash-Enhanced: Loaded.");
     injectInterface();
     attachListeners();
+    initializeToggleMode();
     // Delay load slightly to ensure original scripts have initialized
     setTimeout(loadFromUrl, 500); 
 });
@@ -248,6 +249,34 @@ function setupKeywordClear() {
     keywordInput.addEventListener('input', updateButtonState);
     keywordInput.addEventListener('change', updateButtonState);
     updateButtonState();
+}
+
+function initializeToggleMode() {
+    var config = document.querySelector('td.config');
+    if (!config) return;
+    var hidden = config.style.display === 'none' || config.getAttribute('data-hidden') === 'true';
+    setConfigVisibility(hidden);
+}
+
+function setConfigVisibility(hidden) {
+    var config = document.querySelector('td.config');
+    if (!config) return;
+    config.style.display = hidden ? 'none' : '';
+    config.setAttribute('data-hidden', hidden ? 'true' : 'false');
+    updateToggleLink(hidden);
+}
+
+function updateToggleLink(hidden) {
+    var link = document.getElementById('theToggleModeLink');
+    if (!link) return;
+    link.textContent = hidden ? "Show config" : "Hide config";
+}
+
+function ToggleAdvancedMode() {
+    var config = document.querySelector('td.config');
+    if (!config) return;
+    var hidden = config.getAttribute('data-hidden') === 'true';
+    setConfigVisibility(!hidden);
 }
 
 // --- 3. Core Logic ---

@@ -34,6 +34,14 @@ function Init() {
 
 var SPH_kPasswordPrefix = "@@";
 
+function normalizeIterations(value) {
+	var iterations = Number(value);
+	if (!Number.isFinite(iterations) || iterations <= 0) {
+		return 5000;
+	}
+	return Math.floor(iterations);
+}
+
 /*
  * Returns a conforming hashed password generated from the form's field values.
  */
@@ -41,11 +49,8 @@ function Generate()
 {
 	StoreConfig();
 	var salt = document.hashform.salt.value;
-	var iterations = Number(document.hashform.iterations.value);
-	if (!Number.isFinite(iterations) || iterations <= 0) {
-		iterations = 5000;
-		document.hashform.iterations.value = iterations;
-	}
+	var iterations = normalizeIterations(document.hashform.iterations.value);
+	document.hashform.iterations.value = iterations;
 	var uri = document.hashform.domain.value;
 	var domain = (new SPH_DomainExtractor()).extractDomain(uri);
 	var size = SPH_kPasswordPrefix.length;
@@ -73,11 +78,8 @@ function StoreConfig()
 {
 	if (typeof(Storage) !== "undefined") {
 		localStorage.salt = document.hashform.salt.value;
-		var iterations = Number(document.hashform.iterations.value);
-		if (!Number.isFinite(iterations) || iterations <= 0) {
-			iterations = 5000;
-			document.hashform.iterations.value = iterations;
-		}
+		var iterations = normalizeIterations(document.hashform.iterations.value);
+		document.hashform.iterations.value = iterations;
 		localStorage.iterations = iterations;
 	}
 }
@@ -96,7 +98,7 @@ function LoadConfig()
 		}
 
 		if (localStorage.iterations && Number(localStorage.iterations) > 0) {
-			document.hashform.iterations.value = Number(localStorage.iterations);
+			document.hashform.iterations.value = normalizeIterations(localStorage.iterations);
 		}
 		else {
 			document.hashform.iterations.value = 5000;
