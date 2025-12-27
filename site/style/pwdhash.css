@@ -106,6 +106,12 @@ h1
   text-align: center; 
 }
 
+h1.main-title
+{
+  color: #0000FF;
+  font-family: Arial, sans-serif;
+}
+
 div.footer 
 {
  font-size: xx-small;
@@ -344,6 +350,14 @@ table#theHashForm .keyword-clear
   stroke: #333;
   stroke-width: 2;
   fill: none;
+}
+
+/* Auto-fill indicator */
+#autofill-notice
+{
+  background: #e6f0fa;
+  border-color: #7bb4d4;
+  color: #0b4e5e;
 }
 
 @media (max-width: 700px)

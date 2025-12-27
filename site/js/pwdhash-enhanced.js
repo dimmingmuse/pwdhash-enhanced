@@ -1,6 +1,6 @@
 /* 
    pwdhash-enhanced.js
-   Features: Min/Max Length, Special Character Rules, Capitalization, URL State, User Hint, Dynamic Title
+   Features: Min/Max Length, Special Character Rules, Capitalization, URL State, User Hint, Dynamic Title, Auto-fill
    Fixes: CSP compliance, Logic order for Max Length, Selector specificity
 */
 
@@ -12,6 +12,116 @@ window.addEventListener('load', function() {
     // Delay load slightly to ensure original scripts have initialized
     setTimeout(loadFromUrl, 500); 
 });
+
+// --- 0. Auto-fill from Site Requirements ---
+
+/**
+ * Normalize a domain or keyword for lookup in SITE_REQUIREMENTS
+ * Examples:
+ *   "secure.chase.com" → "chase"
+ *   "www.bankofamerica.com" → "bankofamerica"
+ *   "login.paypal.com" → "paypal"
+ *   "Amazon" → "amazon"
+ */
+function normalizeForLookup(input) {
+    if (!input) return "";
+    return input
+        .toLowerCase()
+        .trim()
+        .replace(/^(https?:\/\/)?/, "")          // strip protocol
+        .replace(/^(www|secure|login|auth|account|my|signin|signon)\./, "")  // strip common subdomains
+        .replace(/\/.*$/, "")                     // strip path
+        .replace(/\.(com|org|net|edu|gov|io|co|me|app|dev|ai|tv|info|biz|us|uk|ca|au|de|fr|jp|cn|in|br|ru|co\.uk|com\.au|co\.jp|com\.br)$/, "")  // strip TLD
+        .replace(/[^a-z0-9]/g, "");               // remove remaining non-alphanumeric
+}
+
+/**
+ * Check if auto-fill data exists for the given input and apply it
+ */
+function checkAutoFill(rawValue) {
+    if (typeof SITE_REQUIREMENTS === 'undefined') {
+        console.log("PwdHash-Enhanced: SITE_REQUIREMENTS not loaded");
+        return false;
+    }
+    
+    var key = normalizeForLookup(rawValue);
+    if (!key) return false;
+    
+    var reqs = SITE_REQUIREMENTS[key];
+    if (reqs) {
+        applyRequirements(reqs, false);  // false = don't clear first
+        showAutoFillNotice(key);
+        return true;
+    }
+    return false;
+}
+
+/**
+ * Apply requirements to the form
+ */
+function applyRequirements(reqs, clearFirst) {
+    if (clearFirst) {
+        clearRequirements();
+    }
+    
+    if (reqs.min) document.getElementById('ext-minLength').value = reqs.min;
+    if (reqs.max) document.getElementById('ext-maxLength').value = reqs.max;
+    if (reqs.noSym) document.getElementById('chk-nosym').checked = true;
+    if (reqs.reqSym) document.getElementById('chk-reqsym').checked = true;
+    if (reqs.reqNum) document.getElementById('chk-reqnum').checked = true;
+    if (reqs.reqCap) document.getElementById('chk-reqcap').checked = true;
+    // Note: hint is intentionally NOT auto-filled - it's for personal notes
+    
+    // Trigger constraint application
+    applyConstraints();
+}
+
+/**
+ * Clear all requirement fields to defaults
+ */
+function clearRequirements() {
+    document.getElementById('ext-minLength').value = "";
+    document.getElementById('ext-maxLength').value = "";
+    document.getElementById('chk-nosym').checked = false;
+    document.getElementById('chk-reqsym').checked = false;
+    document.getElementById('chk-reqnum').checked = false;
+    document.getElementById('chk-reqcap').checked = false;
+    // Note: hint is intentionally NOT cleared - it's for personal notes
+}
+
+/**
+ * Show notification that auto-fill was applied
+ */
+function showAutoFillNotice(siteName) {
+    var notice = ensureAutoFillNotice();
+    if (!notice) return;
+    
+    notice.innerText = "Auto-filled rules for " + siteName;
+    positionCopyNotice(notice);
+    notice.classList.add('show');
+    
+    if (window.autoFillNoticeTimer) clearTimeout(window.autoFillNoticeTimer);
+    window.autoFillNoticeTimer = setTimeout(function() {
+        notice.classList.remove('show');
+    }, 2400);
+}
+
+function ensureAutoFillNotice() {
+    var existing = document.getElementById('autofill-notice');
+    if (existing) return existing;
+    
+    var hashedSection = document.getElementById('theHashedPassword');
+    if (!hashedSection) return null;
+    
+    var notice = document.createElement('div');
+    notice.id = "autofill-notice";
+    notice.className = "copy-notice";
+    notice.setAttribute('role', 'status');
+    notice.setAttribute('aria-live', 'polite');
+    
+    hashedSection.appendChild(notice);
+    return notice;
+}
 
 // --- 1. Interface Injection ---
 function injectInterface() {
@@ -182,18 +292,31 @@ function attachListeners() {
 
     setupKeywordClear();
 
-    // Specific listener for Page Title updates (Site Keyword field)
-    // We use :not(#ext-hint) to ensure we don't grab the hint field by mistake
+    // Specific listener for Page Title updates and Auto-fill (Site Keyword field)
     var siteInput = document.querySelector('input[type="text"]:not([readonly]):not(#ext-hint)');
     if (siteInput) {
-        var updateTitle = function() {
+        var lastAutoFillValue = "";
+        
+        var handleSiteChange = function() {
+            // Update title
             if (siteInput.value) {
                 document.title = "Site password for " + siteInput.value;
             }
+            
+            // Attempt auto-fill only when value changes significantly
+            var normalized = normalizeForLookup(siteInput.value);
+            if (normalized && normalized !== lastAutoFillValue) {
+                if (checkAutoFill(siteInput.value)) {
+                    lastAutoFillValue = normalized;
+                }
+            }
         };
-        siteInput.addEventListener('input', updateTitle);
-        siteInput.addEventListener('keyup', updateTitle);
-        siteInput.addEventListener('change', updateTitle);
+        
+        siteInput.addEventListener('input', handleSiteChange);
+        siteInput.addEventListener('change', handleSiteChange);
+        
+        // Also handle blur for paste scenarios
+        siteInput.addEventListener('blur', handleSiteChange);
     }
 
     var noSymInput = document.getElementById('chk-nosym');
@@ -244,6 +367,7 @@ function setupKeywordClear() {
         keywordInput.dispatchEvent(new Event('input', { bubbles: true }));
         keywordInput.focus();
         updateButtonState();
+        clearRequirements();  // Also clear auto-filled requirements
     });
 
     keywordInput.addEventListener('input', updateButtonState);
@@ -548,6 +672,15 @@ function loadFromUrl() {
             siteInput.dispatchEvent(new Event('input', { bubbles: true }));
             document.title = "Site password for " + site; // Update Title on Load
             
+            // Only auto-fill if NO URL params were provided for requirements
+            var hasUrlRequirements = params.get('nosym') || params.get('reqnum') || 
+                                     params.get('reqsym') || params.get('reqcap') || 
+                                     params.get('min') || params.get('max');
+            
+            if (!hasUrlRequirements) {
+                checkAutoFill(site);
+            }
+            
             if (typeof Generate === 'function') Generate();
             else if (typeof generate === 'function') generate();
             setTimeout(processHash, 100);
@@ -581,6 +714,20 @@ function copySafeUrl() {
 
     window.history.replaceState({}, '', url);
     navigator.clipboard.writeText(url.toString()).then(function() {
-        alert("Configuration Link Copied!");
+        showConfigCopiedNotice();
     });
+}
+
+function showConfigCopiedNotice() {
+    var notice = ensureAutoFillNotice();
+    if (!notice) return;
+    
+    notice.innerText = "Configuration link copied!";
+    positionCopyNotice(notice);
+    notice.classList.add('show');
+    
+    if (window.autoFillNoticeTimer) clearTimeout(window.autoFillNoticeTimer);
+    window.autoFillNoticeTimer = setTimeout(function() {
+        notice.classList.remove('show');
+    }, 2400);
 }

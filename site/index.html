@@ -1,6 +1,6 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
-  <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'" />
   <meta name="google-site-verification" content="tsC40Go6u6ldH1pmeafOZhKJc7v1dxGQ6lYzxqlkN2I" />
@@ -26,6 +26,7 @@
   <script src="js/pwdhash.js" type="text/javascript"></script>
   <script src="js/hashed-password.js" type="text/javascript"></script>
   <script src="js/domain-extractor.js" type="text/javascript"></script>
+  <script src="js/site-requirements.js" type="text/javascript"></script>
   <link rel="stylesheet" type="text/css" href="style/pwdhash.css" />
   <link rel="shortcut icon" href="favicon.ico" />
 </head>
@@ -87,22 +88,25 @@ Config is stored locally in your browser across sessions
 
 </table>
 
-</td></tr><tr><td><div class="footer">Version 0.2</div>
+</td></tr><tr><td><div class="footer">Version 0.3</div>
 <div class="footer">Tip: You can save this page to disk.</div>
 </td></tr></table>
 
 <p align="center"><img src="images/cambridge_crest64.png"
    alt="Stanford" align="center" width="64" height="64"> </p>
 
-<h1 align=center><font color="#0000FF" face="Arial">
-Cambridge PwdHash PoC
-</font></h1>
+<h1 class="main-title">Cambridge PwdHash PoC</h1>
 	            
 <div id="theexplanation">
 <p>
 PwdHash generates password mutations. It's a proof-of-concept alteration of the original <a href="https://www.pwdhash.com">Stanford PwdHash</a>, but with a number of improvements that fix some of the weaknesses of the original. PwdHash-PoC uses the <a href="https://github.com/digitalbazaar/forge">Forge</a> implementation of PBKDF2-SHA512 to generate hashes.</p>
 
 <p>PwdHash will not turn a weak password into a strong one. <b>Always ensure your master password is sufficiently complex</b>.</p>
+
+<h3>Bookmarklet</h3>
+<p>Drag this link to your bookmarks bar: <a href="javascript:(function(){var n='pwdhash_window',b='https://dimmingmuse.github.io/pwdhash-enhanced/site/',f='location=yes,height=420,width=340,scrollbars=yes,status=yes',d=(location.hostname||'').replace(/^www\./,''),u=b+(d?'?site='+encodeURIComponent(d):''),w=window.open(u,n,f);w.focus();})();">PwdHash</a></p>
+
+<h3>Resources</h3>
 <ul>
 <li>Visit the original <a href="https://www.pwdhash.com">PwdHash website</a>.</li>
 <li>Visit the <a href="http://www.cl.cam.ac.uk/research/security/">Cambridge Security Group website</a>.</li>
