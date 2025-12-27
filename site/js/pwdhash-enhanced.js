@@ -179,6 +179,8 @@ function attachListeners() {
         });
     }
 
+    setupKeywordClear();
+
     // Specific listener for Page Title updates (Site Keyword field)
     // We use :not(#ext-hint) to ensure we don't grab the hint field by mistake
     var siteInput = document.querySelector('input[type="text"]:not([readonly]):not(#ext-hint)');
@@ -225,6 +227,27 @@ function attachListeners() {
         iterationInput.addEventListener('input', function() { validateNumberInput(iterationInput, { minValue: 1 }); });
         iterationInput.addEventListener('change', function() { validateNumberInput(iterationInput, { minValue: 1 }); });
     }
+}
+
+function setupKeywordClear() {
+    var keywordInput = document.getElementById('keywordInput');
+    var clearButton = document.getElementById('keywordClear');
+    if (!keywordInput || !clearButton) return;
+
+    var updateButtonState = function() {
+        clearButton.disabled = !keywordInput.value;
+    };
+
+    clearButton.addEventListener('click', function() {
+        keywordInput.value = "";
+        keywordInput.dispatchEvent(new Event('input', { bubbles: true }));
+        keywordInput.focus();
+        updateButtonState();
+    });
+
+    keywordInput.addEventListener('input', updateButtonState);
+    keywordInput.addEventListener('change', updateButtonState);
+    updateButtonState();
 }
 
 // --- 3. Core Logic ---
@@ -493,6 +516,7 @@ function loadFromUrl() {
         var siteInput = document.querySelector('input[type="text"]:not([readonly]):not(#ext-hint)');
         if (siteInput) {
             siteInput.value = site;
+            siteInput.dispatchEvent(new Event('input', { bubbles: true }));
             document.title = "Site password for " + site; // Update Title on Load
             
             if (typeof Generate === 'function') Generate();
