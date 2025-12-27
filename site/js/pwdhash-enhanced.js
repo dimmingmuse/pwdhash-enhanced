@@ -70,6 +70,7 @@ function applyRequirements(reqs, clearFirst) {
     if (reqs.reqSym) document.getElementById('chk-reqsym').checked = true;
     if (reqs.reqNum) document.getElementById('chk-reqnum').checked = true;
     if (reqs.reqCap) document.getElementById('chk-reqcap').checked = true;
+    if (reqs.reqLower) document.getElementById('chk-reqlower').checked = true;
     // Note: hint is intentionally NOT auto-filled - it's for personal notes
     
     // Trigger constraint application
@@ -86,6 +87,7 @@ function clearRequirements() {
     document.getElementById('chk-reqsym').checked = false;
     document.getElementById('chk-reqnum').checked = false;
     document.getElementById('chk-reqcap').checked = false;
+    document.getElementById('chk-reqlower').checked = false;
     // Note: hint is intentionally NOT cleared - it's for personal notes
 }
 
@@ -233,11 +235,15 @@ function injectInterface() {
         return tr;
     }
 
+    // SVG icon for lowercase
+    var iconLower = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 11a4 4 0 1 0 0 8 4 4 0 0 0 0-8zM17 11V7"></path></svg>`;
+
     // Insert Checkboxes
     parentTable.insertBefore(createCheckRow("chk-reqsym", "Require Symbol", "<b>@</b>"), insertBeforeRow);
     parentTable.insertBefore(createCheckRow("chk-nosym", "Ban Symbols", iconNoSym), insertBeforeRow);
     parentTable.insertBefore(createCheckRow("chk-reqnum", "Require Number", "<b>#</b>"), insertBeforeRow);
     parentTable.insertBefore(createCheckRow("chk-reqcap", "Require Uppercase", iconCap), insertBeforeRow);
+    parentTable.insertBefore(createCheckRow("chk-reqlower", "Require Lowercase", iconLower), insertBeforeRow);
 
     parentTable.insertBefore(createInlineFieldsRow([
         { id: "ext-minLength", label: "Min Length", type: "number", placeholder: "None" },
@@ -451,6 +457,7 @@ function applyConstraints() {
     var reqNum = document.getElementById('chk-reqnum').checked;
     var reqSym = document.getElementById('chk-reqsym').checked;
     var reqCap = document.getElementById('chk-reqcap').checked;
+    var reqLower = document.getElementById('chk-reqlower').checked;
     var minInput = document.getElementById('ext-minLength');
     var maxInput = document.getElementById('ext-maxLength');
     var min = getValidatedNumber(minInput, { minValue: 0 });
@@ -505,6 +512,7 @@ function applyConstraints() {
 
     var requiredTypes = 0;
     if (reqCap) requiredTypes += 1;
+    if (reqLower) requiredTypes += 1;
     if (reqNum) requiredTypes += 1;
     if (reqSym && !noSym) requiredTypes += 1;
     var canEnforceAll = isNaN(max) || max === 0 || max >= requiredTypes;
@@ -512,7 +520,7 @@ function applyConstraints() {
     if (canEnforceAll) {
         // 4. Enforce Uppercase
         if (reqCap && !/[A-Z]/.test(result)) {
-            if (/[a-z]/.test(result)) {
+            if (/[a-z]/.test(result) && !reqLower) {
                 result = result.replace(/[a-z]/, function(c) { return c.toUpperCase(); });
             } else {
                 var caps = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -521,11 +529,25 @@ function applyConstraints() {
             }
         }
 
+        // 4b. Enforce Lowercase
+        if (reqLower && !/[a-z]/.test(result)) {
+            if (/[A-Z]/.test(result) && !reqCap) {
+                result = result.replace(/[A-Z]/, function(c) { return c.toLowerCase(); });
+            } else {
+                var lowers = "abcdefghijklmnopqrstuvwxyz";
+                var lowerChar = lowers.charAt(result.charCodeAt(0) % lowers.length);
+                var avoidForLower = [];
+                if (reqCap) avoidForLower.push(/[A-Z]/);
+                insertOrReplace(lowerChar, avoidForLower);
+            }
+        }
+
         // 5. Enforce Number
         if (reqNum && !/\d/.test(result)) {
             var numberChar = (result.length % 10).toString();
             var avoidForNumber = [];
             if (reqCap) avoidForNumber.push(/[A-Z]/);
+            if (reqLower) avoidForNumber.push(/[a-z]/);
             if (reqSym && !noSym) avoidForNumber.push(/[^a-zA-Z0-9]/);
             insertOrReplace(numberChar, avoidForNumber);
         }
@@ -536,6 +558,7 @@ function applyConstraints() {
             var symbolChar = syms.charAt(result.charCodeAt(0) % syms.length);
             var avoidForSymbol = [];
             if (reqCap) avoidForSymbol.push(/[A-Z]/);
+            if (reqLower) avoidForSymbol.push(/[a-z]/);
             if (reqNum) avoidForSymbol.push(/\d/);
             insertOrReplace(symbolChar, avoidForSymbol);
         }
@@ -654,6 +677,7 @@ function loadFromUrl() {
     if (params.get('reqnum') === 't') document.getElementById('chk-reqnum').checked = true;
     if (params.get('reqsym') === 't') document.getElementById('chk-reqsym').checked = true;
     if (params.get('reqcap') === 't') document.getElementById('chk-reqcap').checked = true;
+    if (params.get('reqlower') === 't') document.getElementById('chk-reqlower').checked = true;
 
     // Set Numbers
     if (params.get('min')) document.getElementById('ext-minLength').value = params.get('min');
@@ -675,6 +699,7 @@ function loadFromUrl() {
             // Only auto-fill if NO URL params were provided for requirements
             var hasUrlRequirements = params.get('nosym') || params.get('reqnum') || 
                                      params.get('reqsym') || params.get('reqcap') || 
+                                     params.get('reqlower') ||
                                      params.get('min') || params.get('max');
             
             if (!hasUrlRequirements) {
@@ -708,6 +733,7 @@ function copySafeUrl() {
     setBool('chk-reqnum', 'reqnum');
     setBool('chk-reqsym', 'reqsym');
     setBool('chk-reqcap', 'reqcap');
+    setBool('chk-reqlower', 'reqlower');
     setVal('ext-minLength', 'min');
     setVal('ext-maxLength', 'max');
     setVal('ext-hint', 'hint');

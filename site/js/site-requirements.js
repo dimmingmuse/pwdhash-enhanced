@@ -28,9 +28,9 @@ var SITE_REQUIREMENTS = {
     "google": { min: 8, reqCap: false, reqNum: false, hint: "8+ chars" },
     "gmail": { min: 8, reqCap: false, reqNum: false, hint: "8+ chars" },
     "youtube": { min: 8, reqCap: false, reqNum: false, hint: "8+ chars" },
-    "microsoft": { min: 8, reqCap: true, reqNum: true, reqSym: true, hint: "8+, mixed case, num, symbol" },
-    "outlook": { min: 8, reqCap: true, reqNum: true, reqSym: true, hint: "8+, mixed case, num, symbol" },
-    "live": { min: 8, reqCap: true, reqNum: true, reqSym: true, hint: "8+, mixed case, num, symbol" },
+    "microsoft": { min: 8, reqCap: true, reqLower: true, reqNum: true, reqSym: true, hint: "8+, mixed case, num, symbol" },
+    "outlook": { min: 8, reqCap: true, reqLower: true, reqNum: true, reqSym: true, hint: "8+, mixed case, num, symbol" },
+    "live": { min: 8, reqCap: true, reqLower: true, reqNum: true, reqSym: true, hint: "8+, mixed case, num, symbol" },
     "amazon": { min: 8, max: 128, reqCap: true, reqNum: true, hint: "8-128 chars" },
     "aws": { min: 8, max: 128, reqCap: true, reqNum: true, reqSym: true, hint: "8-128, symbol required" },
 
@@ -86,7 +86,7 @@ var SITE_REQUIREMENTS = {
     // Productivity / Work
     "dropbox": { min: 8, hint: "8+ chars" },
     "slack": { min: 8, hint: "8+ chars" },
-    "zoom": { min: 8, max: 32, reqCap: true, reqNum: true, reqSym: true, hint: "8-32, symbol required" },
+    "zoom": { min: 8, max: 99, reqCap: true, reqLower: true, reqNum: true, hint: "8-99, upper+lower+num" },
     "github": { min: 8, reqNum: true, hint: "8+, include number" },
     "gitlab": { min: 8, hint: "8+ chars" },
     "bitbucket": { min: 8, hint: "8+ chars" },
