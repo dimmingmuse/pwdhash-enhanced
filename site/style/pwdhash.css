@@ -208,6 +208,10 @@ table#theHashForm .copy-button
   width: 28px;
   height: 28px;
   cursor: pointer;
+  color: #333;
+  font-size: 18px;
+  font-weight: bold;
+  padding: 0;
   line-height: 1;
   display: inline-flex;
   align-items: center;
@@ -224,6 +228,7 @@ table#theHashForm .copy-button
 .keyword-clear:disabled
 {
   opacity: 0.5;
+  color: #666;
   cursor: default;
 }
 
