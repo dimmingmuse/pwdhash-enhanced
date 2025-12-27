@@ -185,7 +185,7 @@ table#theHashForm .copy-button
   width: auto;
 }
 
-.keyword-row
+table#theHashForm .keyword-row
 {
   display: flex;
   align-items: center;
@@ -194,14 +194,14 @@ table#theHashForm .copy-button
   box-sizing: border-box;
 }
 
-.keyword-row input
+table#theHashForm .keyword-row input
 {
   flex: 1 1 auto;
   width: auto;
   min-width: 0;
 }
 
-.keyword-clear
+table#theHashForm .keyword-clear
 {
   border: 1px solid #bdbdbd;
   background: #f6f6f6;
