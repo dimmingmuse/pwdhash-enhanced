@@ -516,6 +516,7 @@ function loadFromUrl() {
         var siteInput = document.querySelector('input[type="text"]:not([readonly]):not(#ext-hint)');
         if (siteInput) {
             siteInput.value = site;
+            siteInput.dispatchEvent(new Event('input', { bubbles: true }));
             document.title = "Site password for " + site; // Update Title on Load
             
             if (typeof Generate === 'function') Generate();
