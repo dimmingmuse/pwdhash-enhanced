@@ -138,7 +138,6 @@ function injectInterface() {
 
     // SVG Icons
     var iconNoSym = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg>`;
-    var iconCap   = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 20l5-16 5 16M16 13H8"></path></svg>`;
     
     // Helper to create checkbox row (CSP Safe)
     function createCheckRow(id, label, iconHtml) {
@@ -154,8 +153,16 @@ function injectInterface() {
         span.style.display = "inline-flex";
         span.style.alignItems = "center";
         span.style.gap = "4px";
-        span.innerHTML = iconHtml + " " + label;
         
+        var iconSpan = document.createElement('span');
+        iconSpan.className = "check-icon";
+        iconSpan.innerHTML = iconHtml;
+        
+        var labelSpan = document.createElement('span');
+        labelSpan.textContent = label;
+        
+        span.appendChild(iconSpan);
+        span.appendChild(labelSpan);
         tdLabel.appendChild(span);
         
         var tdInput = document.createElement('td');
@@ -235,15 +242,12 @@ function injectInterface() {
         return tr;
     }
 
-    // SVG icon for lowercase
-    var iconLower = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 11a4 4 0 1 0 0 8 4 4 0 0 0 0-8zM17 11V7"></path></svg>`;
-
     // Insert Checkboxes
     parentTable.insertBefore(createCheckRow("chk-reqsym", "Require Symbol", "<b>@</b>"), insertBeforeRow);
     parentTable.insertBefore(createCheckRow("chk-nosym", "Ban Symbols", iconNoSym), insertBeforeRow);
     parentTable.insertBefore(createCheckRow("chk-reqnum", "Require Number", "<b>#</b>"), insertBeforeRow);
-    parentTable.insertBefore(createCheckRow("chk-reqcap", "Require Uppercase", iconCap), insertBeforeRow);
-    parentTable.insertBefore(createCheckRow("chk-reqlower", "Require Lowercase", iconLower), insertBeforeRow);
+    parentTable.insertBefore(createCheckRow("chk-reqcap", "Require Uppercase", "<b>A</b>"), insertBeforeRow);
+    parentTable.insertBefore(createCheckRow("chk-reqlower", "Require Lowercase", "<b><u>a</u></b>"), insertBeforeRow);
 
     parentTable.insertBefore(createInlineFieldsRow([
         { id: "ext-minLength", label: "Min Length", type: "number", placeholder: "None" },

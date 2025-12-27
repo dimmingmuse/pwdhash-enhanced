@@ -169,6 +169,16 @@ table#theHashForm tr.check-row td.check-input
   padding-left: 5px;
 }
 
+table#theHashForm .check-icon
+{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  min-width: 18px;
+  text-align: center;
+}
+
 table#theHashForm tr.inline-fields-row td,
 table#theHashForm tr.hint-row td,
 table#theHashForm tr.copy-config-row td
