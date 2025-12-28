@@ -456,6 +456,16 @@ function regenerateHash() {
         return;
     }
 
+    // Check if password is blank before generating hash
+    var passwordField = document.hashform.sitePassword;
+    if (!passwordField || !passwordField.value.trim()) {
+        hashField.value = "";
+        hashField.classList.remove('hash-error');
+        hashField.setAttribute('data-full-hash', '');
+        hashField.setAttribute('data-last-output', '');
+        return;
+    }
+
     hashField.classList.remove('hash-error');
 
     if (typeof GenerateToTextField === 'function') {
