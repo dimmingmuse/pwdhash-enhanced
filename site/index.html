@@ -31,6 +31,7 @@
   <link rel="shortcut icon" href="favicon.ico" />
 </head>
 <body onLoad="Init();">
+<main>
 <table class="leftmargin"><tr><td>
 <form name="hashform" action="error.html" method="POST"
 onsubmit="return TimedGenerate();">
@@ -75,6 +76,7 @@ Please enable Javascript to use this
 <div class="step" id="theUserSalt">
 <h3>Secret Salt</h3>
 <p><input type="text" name="salt" value="ChangeMe"></p>
+<p id="salt-error-message" class="error-message hidden" aria-live="polite">Please change the default salt to a memorable secret phrase</p>
 </div>
 <div class="step" id="theIterations">
 <h3>Iterations</h3>
@@ -93,8 +95,8 @@ Remember your secret salt and iterations for other devices
 </td></tr></table>
 
 <h1 class="main-title">PwdHash Enhanced</h1>
-	            
-<div id="theexplanation">
+
+<section id="theexplanation">
 <p>
 PwdHash Enhanced generates site-specific passwords from a master password. It builds on <a href="http://www.flypig.co.uk/pwdhash/">Cambridge's PwdHash-PoC</a>, which itself improved upon the original <a href="https://www.pwdhash.com">Stanford PwdHash</a>. This version adds configurable password requirements (length limits, character rules) and auto-detection of common site policies.</p>
 
@@ -110,12 +112,13 @@ PwdHash Enhanced generates site-specific passwords from a master password. It bu
 <li><a href="http://www.flypig.co.uk/papers/dlj-gr-passwords16.pdf">Cracking PwdHash paper</a> (PDF)</li>
 <li><a href="https://chrome.google.com/webstore/detail/pwdhash-poc-port/lofhgnhbjellcpcdpkbejffjejhchacj">Chrome extension</a> by <a href="https://github.com/CyBot">CyBot</a></li>
 </ul>
-</div>
+</section>
 </form>
 
-<div class="textcentre footer-attribution">
+<footer class="textcentre footer-attribution">
  Enhanced version modifications are not affiliated with Cambridge or Stanford.
-</div>
+</footer>
+</main>
 <script src="js/pwdhash-enhanced.js"></script>
 </body>
 </html>
