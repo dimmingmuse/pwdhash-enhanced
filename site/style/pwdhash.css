@@ -15,19 +15,40 @@
  * See http://crypto.stanford.edu/PwdHash for more info.
  */
 
-body 
-{ 
-  font-family: sans-serif; 
-  margin: 0 12px 16px 12px; 
-  text-align: center; 
-  font-size: smaller;
+:root
+{
+  /* Color Palette */
+  --color-primary: #0000FF;
+  --color-border-main: green;
+  --color-success: #0b5e2b;
+  --color-success-bg: #e6f7ea;
+  --color-success-border: #7bd49b;
+  --color-error: #c00;
+  --color-error-bg: #fff0f0;
+  --color-info: #0b4e5e;
+  --color-info-bg: #e6f0fa;
+  --color-info-border: #7bb4d4;
+  --color-text-muted: #666;
+  --color-text-primary: #333;
+  --color-bg-config: #dddddd;
+  --color-button-bg: #f6f6f6;
+  --color-button-bg-hover: #eeeeee;
+  --color-button-border: #bdbdbd;
 }
 
-table#theHashForm 
-{ 
-  border: 3px solid green; 
-  margin-left: auto; 
-  margin-right: auto; 
+body
+{
+  font-family: sans-serif;
+  margin: 0 12px 16px 12px;
+  text-align: center;
+  font-size: 0.875rem;
+}
+
+table#theHashForm
+{
+  border: 3px solid var(--color-border-main);
+  margin-left: auto;
+  margin-right: auto;
   text-align: center;
   width: 100%;
   max-width: none;
@@ -51,13 +72,13 @@ table#theHashForm p
 
 td.config
 {
-  border-top: 3px solid green; 
-  background: #dddddd;
+  border-top: 3px solid var(--color-border-main);
+  background: var(--color-bg-config);
 }
 
 .config h3
-{ 
-  font-size: 80%;
+{
+  font-size: 0.8em;
 }
 
 .gapAfter
@@ -67,14 +88,14 @@ td.config
 
 .config-note
 {
-  font-size: 70%;
+  font-size: 0.7em;
 }
 
-div#theexplanation 
+div#theexplanation
 {
-  font-size: larger;
+  font-size: 1.125rem;
   display:block;
-  text-align: left; 
+  text-align: left;
 }
 
 div#theexplanation li
@@ -108,14 +129,14 @@ h1
 
 h1.main-title
 {
-  color: #0000FF;
+  color: var(--color-primary);
   font-family: Arial, sans-serif;
 }
 
-div.footer 
+div.footer
 {
- font-size: xx-small;
- text-align: center; 
+ font-size: 0.625rem;
+ text-align: center;
 }
 
 #theHashedPassword
@@ -130,24 +151,31 @@ div.footer
 
 .notification
 {
-  color: green;
+  color: var(--color-border-main);
 }
 
 .warning
 {
-  color: red;
+  color: var(--color-error);
 }
 
 .salt-error
 {
-  border: 2px solid #c00 !important;
-  background-color: #fff0f0;
+  border: 2px solid var(--color-error) !important;
+  background-color: var(--color-error-bg);
 }
 
 .hash-error
 {
-  color: #c00;
+  color: var(--color-error);
   font-style: italic;
+}
+
+.error-message
+{
+  color: var(--color-error);
+  font-size: 0.75rem;
+  margin: 2px 0 0 0;
 }
 
 .leftmargin
@@ -161,7 +189,7 @@ div.footer
 
 .footer-attribution {
   font-size: smaller;
-  color: #666;
+  color: var(--color-text-muted);
   margin-top: 1em;
 }
 
@@ -181,6 +209,14 @@ table#theHashForm tr.check-row td.check-input
   text-align: left;
   padding-left: 5px;
   white-space: nowrap;
+}
+
+table#theHashForm .check-label-element
+{
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
 }
 
 table#theHashForm .check-icon
@@ -215,6 +251,24 @@ table#theHashForm .copy-button
   width: auto;
 }
 
+.copy-config-button
+{
+  margin-top: 8px;
+  cursor: pointer;
+  white-space: nowrap;
+  border: 1px solid var(--color-button-border);
+  background: var(--color-button-bg);
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: inherit;
+}
+
+.copy-config-button:hover,
+.copy-config-button:focus
+{
+  background: var(--color-button-bg-hover);
+}
+
 table#theHashForm .keyword-row
 {
   display: flex;
@@ -233,13 +287,13 @@ table#theHashForm .keyword-row input
 
 table#theHashForm .keyword-clear
 {
-  border: 1px solid #bdbdbd;
-  background: #f6f6f6;
+  border: 1px solid var(--color-button-border);
+  background: var(--color-button-bg);
   border-radius: 6px;
   width: 22px;
   height: 22px;
   cursor: pointer;
-  color: #333;
+  color: var(--color-text-primary);
   font-size: 16px;
   font-weight: bold;
   padding: 0;
@@ -253,13 +307,13 @@ table#theHashForm .keyword-clear
 .keyword-clear:hover,
 .keyword-clear:focus
 {
-  background: #eeeeee;
+  background: var(--color-button-bg-hover);
 }
 
 .keyword-clear:disabled
 {
   opacity: 0.5;
-  color: #666;
+  color: var(--color-text-muted);
   cursor: default;
 }
 
@@ -281,7 +335,7 @@ table#theHashForm .keyword-clear
 .inline-field label
 {
   display: block;
-  font-size: 70%;
+  font-size: 0.7em;
 }
 
 .inline-field input
@@ -304,11 +358,11 @@ table#theHashForm .keyword-clear
 
 .copy-notice
 {
-  font-size: 80%;
+  font-size: 0.8em;
   font-weight: bold;
-  color: #0b5e2b;
-  background: #e6f7ea;
-  border: 1px solid #7bd49b;
+  color: var(--color-success);
+  background: var(--color-success-bg);
+  border: 1px solid var(--color-success-border);
   border-radius: 6px;
   padding: 6px 10px;
   opacity: 0;
@@ -348,8 +402,8 @@ table#theHashForm .keyword-clear
 
 .copy-button
 {
-  border: 1px solid #bdbdbd;
-  background: #f6f6f6;
+  border: 1px solid var(--color-button-border);
+  background: var(--color-button-bg);
   border-radius: 6px;
   padding: 4px;
   cursor: pointer;
@@ -364,14 +418,14 @@ table#theHashForm .keyword-clear
 .copy-button:hover,
 .copy-button:focus
 {
-  background: #eeeeee;
+  background: var(--color-button-bg-hover);
 }
 
 .copy-button svg
 {
   width: 16px;
   height: 16px;
-  stroke: #333;
+  stroke: var(--color-text-primary);
   stroke-width: 2;
   fill: none;
 }
@@ -379,9 +433,9 @@ table#theHashForm .keyword-clear
 /* Auto-fill indicator */
 #autofill-notice
 {
-  background: #e6f0fa;
-  border-color: #7bb4d4;
-  color: #0b4e5e;
+  background: var(--color-info-bg);
+  border-color: var(--color-info-border);
+  color: var(--color-info);
 }
 
 @media (max-width: 700px)
@@ -411,6 +465,48 @@ table#theHashForm .keyword-clear
 
   .inline-field label
   {
-    font-size: 65%;
+    font-size: 0.65em;
+  }
+}
+
+@media (max-width: 320px)
+{
+  body
+  {
+    margin: 0 8px 12px 8px;
+  }
+
+  table#theHashForm
+  {
+    border-width: 2px;
+  }
+
+  td.stepList
+  {
+    padding: 0px 2px 5px 2px;
+  }
+
+  .inline-fields
+  {
+    gap: 4px;
+  }
+
+  .copy-config-button
+  {
+    font-size: 0.875em;
+    padding: 5px 10px;
+  }
+
+  .copy-notice
+  {
+    font-size: 0.75em;
+    padding: 5px 8px;
+  }
+
+  table#theHashForm .keyword-clear
+  {
+    width: 20px;
+    height: 20px;
+    font-size: 14px;
   }
 }

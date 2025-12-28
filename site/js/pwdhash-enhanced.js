@@ -142,35 +142,32 @@ function injectInterface() {
     function createCheckRow(id, label, iconHtml) {
         var tr = document.createElement('tr');
         tr.className = "check-row";
-        
+
         var tdLabel = document.createElement('td');
-        tdLabel.className = "label";
-        tdLabel.style.verticalAlign = "middle";
-        tdLabel.classList.add("check-label");
-        
-        var span = document.createElement('span');
-        span.style.display = "inline-flex";
-        span.style.alignItems = "center";
-        span.style.gap = "4px";
-        
+        tdLabel.className = "label check-label";
+
+        var labelEl = document.createElement('label');
+        labelEl.setAttribute('for', id);
+        labelEl.className = "check-label-element";
+
         var iconSpan = document.createElement('span');
         iconSpan.className = "check-icon";
         iconSpan.innerHTML = iconHtml;
-        
+        iconSpan.setAttribute('aria-hidden', 'true');
+
         var labelSpan = document.createElement('span');
         labelSpan.textContent = label;
-        
-        span.appendChild(iconSpan);
-        span.appendChild(labelSpan);
-        tdLabel.appendChild(span);
-        
+
+        labelEl.appendChild(iconSpan);
+        labelEl.appendChild(labelSpan);
+        tdLabel.appendChild(labelEl);
+
         var tdInput = document.createElement('td');
         tdInput.classList.add("check-input");
         var input = document.createElement('input');
         input.type = "checkbox";
         input.id = id;
-        input.style.verticalAlign = "middle";
-        
+
         input.addEventListener('change', applyConstraints);
 
         tdInput.appendChild(input);
@@ -192,15 +189,10 @@ function injectInterface() {
         input.id = id;
         input.placeholder = placeholder;
 
-        if (type === "number") {
-            input.style.width = "100%";
-            if (id === "ext-minLength" || id === "ext-maxLength") {
-                input.classList.add("length-input");
-                input.maxLength = 3;
-                input.setAttribute("maxlength", "3");
-            }
-        } else {
-            input.style.width = "100%";
+        if (type === "number" && (id === "ext-minLength" || id === "ext-maxLength")) {
+            input.classList.add("length-input");
+            input.maxLength = 3;
+            input.setAttribute("maxlength", "3");
         }
 
         input.addEventListener('input', applyConstraints);
@@ -253,7 +245,7 @@ function injectInterface() {
         { id: "ext-maxLength", label: "Max Length", type: "number", placeholder: "None" }
     ]), insertBeforeRow);
     parentTable.insertBefore(createSingleFieldRow(
-        { id: "ext-hint", label: "Hint", type: "text", placeholder: "Optional" },
+        { id: "ext-hint", label: "Hint", type: "text", placeholder: "Personal reminder (not synced)" },
         "hint-row"
     ), insertBeforeRow);
 
@@ -264,11 +256,9 @@ function injectInterface() {
     btnTd.colSpan = 2;
     var btn = document.createElement('button');
     btn.type = "button";
+    btn.className = "copy-config-button";
     btn.innerText = "Copy site rules link";
-    btn.style.marginTop = "8px";
-    btn.style.cursor = "pointer";
-    btn.style.whiteSpace = "nowrap";
-    btn.onclick = copySafeUrl;
+    btn.addEventListener('click', copySafeUrl);
 
     btnTd.appendChild(btn);
     btnRow.appendChild(btnTd);
@@ -388,12 +378,19 @@ function updateSaltErrorState() {
     var saltInput = document.getElementsByName('salt')[0];
     if (!saltInput) return;
 
+    var errorMsg = document.getElementById('salt-error-message');
     var isDefault = saltInput.value === 'ChangeMe';
-    
+
     if (isDefault) {
         saltInput.classList.add('salt-error');
+        saltInput.setAttribute('aria-invalid', 'true');
+        saltInput.setAttribute('aria-describedby', 'salt-error-message');
+        if (errorMsg) errorMsg.style.display = 'block';
     } else {
         saltInput.classList.remove('salt-error');
+        saltInput.setAttribute('aria-invalid', 'false');
+        saltInput.removeAttribute('aria-describedby');
+        if (errorMsg) errorMsg.style.display = 'none';
     }
 }
 
