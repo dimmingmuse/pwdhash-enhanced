@@ -385,12 +385,12 @@ function updateSaltErrorState() {
         saltInput.classList.add('salt-error');
         saltInput.setAttribute('aria-invalid', 'true');
         saltInput.setAttribute('aria-describedby', 'salt-error-message');
-        if (errorMsg) errorMsg.style.display = 'block';
+        if (errorMsg) errorMsg.classList.remove('hidden');
     } else {
         saltInput.classList.remove('salt-error');
         saltInput.setAttribute('aria-invalid', 'false');
         saltInput.removeAttribute('aria-describedby');
-        if (errorMsg) errorMsg.style.display = 'none';
+        if (errorMsg) errorMsg.classList.add('hidden');
     }
 }
 
