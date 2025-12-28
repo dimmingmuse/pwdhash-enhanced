@@ -128,11 +128,6 @@ div.footer
   margin: 4px 0 0;
 }
 
-#theToggleModeLink
-{
-  font-size: xx-small;
-}
-
 .notification
 {
   color: green;
@@ -141,6 +136,18 @@ div.footer
 .warning
 {
   color: red;
+}
+
+.salt-error
+{
+  border: 2px solid #c00 !important;
+  background-color: #fff0f0;
+}
+
+.hash-error
+{
+  color: #c00;
+  font-style: italic;
 }
 
 .leftmargin
@@ -173,6 +180,7 @@ table#theHashForm tr.check-row td.check-input
 {
   text-align: left;
   padding-left: 5px;
+  white-space: nowrap;
 }
 
 table#theHashForm .check-icon

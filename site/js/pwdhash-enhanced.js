@@ -8,7 +8,6 @@ window.addEventListener('load', function() {
     console.log("PwdHash-Enhanced: Loaded.");
     injectInterface();
     attachListeners();
-    initializeToggleMode();
     // Delay load slightly to ensure original scripts have initialized
     setTimeout(loadFromUrl, 500); 
 });
@@ -18,10 +17,10 @@ window.addEventListener('load', function() {
 /**
  * Normalize a domain or keyword for lookup in SITE_REQUIREMENTS
  * Examples:
- *   "secure.chase.com" → "chase"
- *   "www.bankofamerica.com" → "bankofamerica"
- *   "login.paypal.com" → "paypal"
- *   "Amazon" → "amazon"
+ *   "secure.chase.com" -> "chase"
+ *   "www.bankofamerica.com" -> "bankofamerica"
+ *   "login.paypal.com" -> "paypal"
+ *   "Amazon" -> "amazon"
  */
 function normalizeForLookup(input) {
     if (!input) return "";
@@ -265,7 +264,7 @@ function injectInterface() {
     btnTd.colSpan = 2;
     var btn = document.createElement('button');
     btn.type = "button";
-    btn.innerText = "Copy config link";
+    btn.innerText = "Copy site rules link";
     btn.style.marginTop = "8px";
     btn.style.cursor = "pointer";
     btn.style.whiteSpace = "nowrap";
@@ -294,7 +293,7 @@ function attachListeners() {
     if (hashField) {
         configureHashedPasswordField(hashField);
         hashField.addEventListener('click', function() {
-            if (hashField.value && hashField.value !== "Press Generate") {
+            if (hashField.value && hashField.value !== "Press Generate" && !hashField.classList.contains('hash-error')) {
                 copyGeneratedPassword(hashField.value);
             }
         });
@@ -361,6 +360,46 @@ function attachListeners() {
         iterationInput.addEventListener('input', function() { validateNumberInput(iterationInput, { minValue: 1 }); });
         iterationInput.addEventListener('change', function() { validateNumberInput(iterationInput, { minValue: 1 }); });
     }
+
+    // Salt validation
+    setupSaltValidation();
+}
+
+function setupSaltValidation() {
+    var saltInput = document.getElementsByName('salt')[0];
+    if (!saltInput) return;
+
+    // Revert to ChangeMe if empty on blur
+    saltInput.addEventListener('blur', function() {
+        if (!saltInput.value.trim()) {
+            saltInput.value = 'ChangeMe';
+        }
+        updateSaltErrorState();
+    });
+
+    saltInput.addEventListener('input', updateSaltErrorState);
+    saltInput.addEventListener('change', updateSaltErrorState);
+
+    // Initial check
+    updateSaltErrorState();
+}
+
+function updateSaltErrorState() {
+    var saltInput = document.getElementsByName('salt')[0];
+    if (!saltInput) return;
+
+    var isDefault = saltInput.value === 'ChangeMe';
+    
+    if (isDefault) {
+        saltInput.classList.add('salt-error');
+    } else {
+        saltInput.classList.remove('salt-error');
+    }
+}
+
+function isSaltValid() {
+    var saltInput = document.getElementsByName('salt')[0];
+    return saltInput && saltInput.value !== 'ChangeMe';
 }
 
 function setupKeywordClear() {
@@ -385,34 +424,6 @@ function setupKeywordClear() {
     updateButtonState();
 }
 
-function initializeToggleMode() {
-    var config = document.querySelector('td.config');
-    if (!config) return;
-    var hidden = config.style.display === 'none' || config.getAttribute('data-hidden') === 'true';
-    setConfigVisibility(hidden);
-}
-
-function setConfigVisibility(hidden) {
-    var config = document.querySelector('td.config');
-    if (!config) return;
-    config.style.display = hidden ? 'none' : '';
-    config.setAttribute('data-hidden', hidden ? 'true' : 'false');
-    updateToggleLink(hidden);
-}
-
-function updateToggleLink(hidden) {
-    var link = document.getElementById('theToggleModeLink');
-    if (!link) return;
-    link.textContent = hidden ? "Show config" : "Hide config";
-}
-
-function ToggleAdvancedMode() {
-    var config = document.querySelector('td.config');
-    if (!config) return;
-    var hidden = config.getAttribute('data-hidden') === 'true';
-    setConfigVisibility(!hidden);
-}
-
 // --- 3. Core Logic ---
 function processHash() {
     var hashField = document.getElementById('hashedPassword') || document.getElementsByName('hashedPassword')[0];
@@ -432,18 +443,29 @@ function processHash() {
 var regenerateTimer;
 function scheduleRegenerate() {
     if (regenerateTimer) clearTimeout(regenerateTimer);
-    regenerateTimer = setTimeout(regenerateHash, 50);
+    regenerateTimer = setTimeout(regenerateHash, 300);
 }
 
 function regenerateHash() {
+    var hashField = document.getElementById('hashedPassword') || document.getElementsByName('hashedPassword')[0];
+    if (!hashField) return;
+
+    // Check if salt is still default
+    if (!isSaltValid()) {
+        hashField.value = "Choose a secret salt you'll remember";
+        hashField.classList.add('hash-error');
+        hashField.setAttribute('data-full-hash', '');
+        hashField.setAttribute('data-last-output', '');
+        return;
+    }
+
+    hashField.classList.remove('hash-error');
+
     if (typeof GenerateToTextField === 'function') {
         GenerateToTextField();
     } else if (typeof Generate === 'function') {
-        var hashField = document.getElementById('hashedPassword') || document.getElementsByName('hashedPassword')[0];
-        if (hashField) {
-            hashField.value = Generate();
-            hashField.disabled = false;
-        }
+        hashField.value = Generate();
+        hashField.disabled = false;
     }
     processHash();
 }
@@ -661,7 +683,7 @@ function insertHashedPasswordCopyButton(hashField) {
     button.title = 'Copy hashed password';
     button.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="9" y="9" width="11" height="11" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
     button.addEventListener('click', function() {
-        if (hashField.value && hashField.value !== "Press Generate") {
+        if (hashField.value && hashField.value !== "Press Generate" && !hashField.classList.contains('hash-error')) {
             copyGeneratedPassword(hashField.value);
         }
     });
@@ -752,7 +774,7 @@ function showConfigCopiedNotice() {
     var notice = ensureAutoFillNotice();
     if (!notice) return;
     
-    notice.innerText = "Configuration link copied!";
+    notice.innerText = "Site rules link copied!";
     positionCopyNotice(notice);
     notice.classList.add('show');
     

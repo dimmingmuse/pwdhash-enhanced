@@ -37,7 +37,7 @@ var SPH_kPasswordPrefix = "@@";
 function normalizeIterations(value) {
 	var iterations = Number(value);
 	if (!Number.isFinite(iterations) || iterations <= 0) {
-		return 5000;
+		return 50000;
 	}
 	return Math.floor(iterations);
 }
@@ -101,7 +101,7 @@ function LoadConfig()
 			document.hashform.iterations.value = normalizeIterations(localStorage.iterations);
 		}
 		else {
-			document.hashform.iterations.value = 5000;
+			document.hashform.iterations.value = 50000;
 		}
 	}
 }

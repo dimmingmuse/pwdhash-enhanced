@@ -54,7 +54,7 @@ Please enable Javascript to use this
 </p>
 </div>
 <div class="step" id="theSitePassword">
-<h3>Site Password</h3>
+<h3>Secret Password</h3>
 <p><input type="password" name="sitePassword"></p>
 </div>
 </td>
@@ -66,29 +66,29 @@ Please enable Javascript to use this
   <span id="theGeneratePanel">
     <input type="text" name="hashedPassword">
   </span>
-<p align="center"><a id="theToggleModeLink" href="javascript:ToggleAdvancedMode()"></a></p>
+
 </div>
 </td>
 </tr>
 <tr>
 <td class="stepList config" colspan="2">
 <div class="step" id="theUserSalt">
-<h3>Config: User Salt</h3>
+<h3>Secret Salt</h3>
 <p><input type="text" name="salt" value="ChangeMe"></p>
 </div>
 <div class="step" id="theIterations">
-<h3>Config: Iterations</h3>
-<p><input type="number" name="iterations" value="5000"></p>
+<h3>Iterations</h3>
+<p><input type="number" name="iterations" value="50000"></p>
 </div>
 <span class="config-note">
-Config is stored locally in your browser across sessions
+Remember your secret salt and iterations for other devices
 </span>
 </td>
 </tr>
 
 </table>
 
-</td></tr><tr><td><div class="footer">Version 0.3</div>
+</td></tr><tr><td><div class="footer">Enhanced version: 1.0</div>
 <div class="footer">Tip: You can save this page to disk.</div>
 </td></tr></table>
 
@@ -106,7 +106,7 @@ PwdHash Enhanced generates site-specific passwords from a master password. It bu
 <h3>Background</h3>
 <ul>
 <li>Original <a href="https://www.pwdhash.com">Stanford PwdHash</a> (2004-2005) by Dan Boneh, Collin Jackson, John Mitchell, Nick Miyake, and Blake Ross</li>
-<li><a href="http://www.flypig.co.uk/pwdhash/">Cambridge PwdHash-PoC</a> (2016) by <a href="http://www.cl.cam.ac.uk/~dl551/">David Llewellyn-Jones</a> and <a href="https://www.cl.cam.ac.uk/people/#gr348">Graham Rymer</a> — fixed flaws in original, uses PBKDF2-SHA512</li>
+<li><a href="http://www.flypig.co.uk/pwdhash/">Cambridge PwdHash-PoC</a> (2016) by <a href="http://www.cl.cam.ac.uk/~dl551/">David Llewellyn-Jones</a> and <a href="https://www.cl.cam.ac.uk/people/#gr348">Graham Rymer</a> - fixed flaws in original, uses PBKDF2-SHA512</li>
 <li><a href="http://www.flypig.co.uk/papers/dlj-gr-passwords16.pdf">Cracking PwdHash paper</a> (PDF)</li>
 <li><a href="https://chrome.google.com/webstore/detail/pwdhash-poc-port/lofhgnhbjellcpcdpkbejffjejhchacj">Chrome extension</a> by <a href="https://github.com/CyBot">CyBot</a></li>
 </ul>
