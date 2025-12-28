@@ -245,7 +245,7 @@ function injectInterface() {
         { id: "ext-maxLength", label: "Max Length", type: "number", placeholder: "None" }
     ]), insertBeforeRow);
     parentTable.insertBefore(createSingleFieldRow(
-        { id: "ext-hint", label: "Hint", type: "text", placeholder: "Personal reminder (not synced)" },
+        { id: "ext-hint", label: "Hint", type: "text", placeholder: "Optional note (included in link)" },
         "hint-row"
     ), insertBeforeRow);
 
