@@ -84,7 +84,7 @@ var SITE_REQUIREMENTS = {
     "hilton": { min: 8, max: 32, reqCap: true, reqNum: true, hint: "8-32 chars" },
 
     // Productivity / Work
-    "dropbox": { min: 8, hint: "8+ chars" },
+    "dropbox": { min: 8, hint: "8+ chars", reqSym: true },
     "slack": { min: 8, hint: "8+ chars" },
     "zoom": { min: 8, max: 99, reqCap: true, reqLower: true, reqNum: true, hint: "8-99, upper+lower+num" },
     "github": { min: 8, reqNum: true, hint: "8+, include number" },
